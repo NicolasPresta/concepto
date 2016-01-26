@@ -15,7 +15,6 @@ const router = express.Router()
 //const sem = semaforo(1)
 const redis = new Redis()
 
-console.log(redis)
 
 // Puntos de entrada de la API
 router.get('/push/:param', (req, res) => {

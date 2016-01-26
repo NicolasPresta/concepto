@@ -18,6 +18,14 @@
     "serve": "node dist/src",
     "start": "npm run dist & npm run serve"
   },
-  "author": "NMR",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicolasPresta/concepto.git"
+  },
+  "author": "Nicolás Presta <presta_26@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NicolasPresta/concepto/issues"
+  },
+  "homepage": "https://github.com/NicolasPresta/concepto#readme"
 }
