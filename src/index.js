@@ -35,10 +35,12 @@ router.get('/shift', (req, res) => {
 		console.log(err)
 
   	console.log(result)
+
+  	let elemento = cola.shift()
+	res.json({cola: cola, elemento: elemento})
     })
 
-   	let elemento = cola.shift()
-	res.json({cola: cola, elemento: elemento})
+
 
 })
 
