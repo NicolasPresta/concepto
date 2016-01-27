@@ -3,23 +3,23 @@
 Para pruebas de concepto varias... 
 
 
-## Instalación
+### Instalación
 
 ```
 npm install
 ```
 
-## Ejecutar
+### Ejecutar
 
 ```
 npm start
 ```
 
-## Ejecutar en otro puerto *(Ej: 3001)*
+### Ejecutar en otro puerto *(Ej: 3001)*
 
 ```
 npm run dist
-node dist/src **3001**
+node dist/src 3001
 ```
 
 
