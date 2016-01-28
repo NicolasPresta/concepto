@@ -10,7 +10,7 @@ import socketio from 'socket.io'
 const app = express()
 const server = http.createServer(app)
 //const port = process.env.PORT || 3000
-const port = process.argv[2] || 3000
+const port = process.argv[2] || 3001
 const router = express.Router()
 //const sem = semaforo(1)
 //const redis = new Redis()
