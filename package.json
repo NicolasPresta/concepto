@@ -8,7 +8,8 @@
     "babelify": "^7.2.0",
     "express": "^4.13.3",
     "ioredis": "^1.14.0",
-    "semaphore": "^1.0.3"
+    "semaphore": "^1.0.3",
+    "socket.io": "^1.4.5"
   },
   "devDependencies": {
     "babel-cli": "^6.2.0"
