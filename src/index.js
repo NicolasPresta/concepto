@@ -3,7 +3,7 @@ import http from 'http'
 import express from 'express'
 //import semaforo from 'semaphore'
 //import Redis from 'ioredis'
-import cola from './lib/cola.js'
+import colaManager from './lib/cola.js'
 import socketio from 'socket.io'
 import Log from 'log'
 
@@ -22,6 +22,7 @@ const log = new Log('info');
 
 const ROOM_EN_FILA = 1
 
+const cola = []
 
 // Puntos de entrada REST
 router.get('/push/:param', (req, res) => {
