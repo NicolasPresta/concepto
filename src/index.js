@@ -45,10 +45,16 @@ app.use(router)
 io.on('connection', (socket) => {
   log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`)
 
+  // Uso el id del socket como identificador único, claramente eso no puede usarse en la realidad, ya que
+  // un cliente podria conectarse, desconectarse y volverse a conectar con otro socket.id, pero seguiria siendo el mismo cliente.
   socket.emit('tomaID', socket.id)
 
   socket.on('disconnect', () =>{
     log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`)
+
+    // Esto abria que controlarlo, pero para prototipar lo dejo asi:
+    colaManager.salirFila(socket.id)
+    colaManager.cerrarCaja(socket.id)
   })
 
   socket.on('saludoGeneral', () => {

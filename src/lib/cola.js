@@ -87,7 +87,7 @@ var colaManager = {
 		this.cajas.push(nuevaCaja)
 
 		// Llamamos a MAXIMO_POR_CAJA personas para que se acerquen
-		for (var i = MAXIMO_POR_CAJA; i >= 0; i--) {
+		for (let i = MAXIMO_POR_CAJA; i > 0; i--) {
 			this.llamarCliente(nuevaCaja)
 		}
 	},
