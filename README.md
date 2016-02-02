@@ -23,5 +23,14 @@ node dist/src 3001
 ```
 
 
+### Conectar clientes:
+
+```
+Abrir la página web Cliente/cliente.html
+
+abrir varias paginas para obtener varios clientes
+pueden ser cajas o clientes.
+
+```
 
 
