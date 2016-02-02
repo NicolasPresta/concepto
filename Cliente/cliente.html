@@ -7,31 +7,101 @@
 </head>
 <body>
 
+<div class="col-md-4">
+  <h2>Yo soy</h2>
+  <h3 id="socketID"></h2>
+</div>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#menuCliente">Cliente</a></li>
+  <li><a data-toggle="tab" href="#menuCaja">Caja</a></li>
+</ul>
+
+
+<div class="tab-content">
+  <div id="menuCliente" class="tab-pane fade in active">
+    <div class="col-md-12">
+      <button type="button" class="btn btn-lg btn-success" id="hacerFila">Hacer Fila</button>
+      <button type="button" class="btn btn-lg btn-danger" id="salirFila">Salir Fila</button>
+    </div>
+  </div>
+  <div id="menuCaja" class="tab-pane fade">
+    <div class="col-md-12">
+      <button type="button" class="btn btn-lg btn-success" id="abrirCaja">Registrar caja</button>
+      <button type="button" class="btn btn-lg btn-danger" id="cerrarCaja">Baja de caja</button>
+    </div>
+
+    <div class="col-md-12">
+      <button type="button" class="btn btn-lg btn-default" id="atendiCliente">Atendí Cliente</button>
+      <input type="text" class="form-control" id="idCliente">
+      <button type="button" class="btn btn-lg btn-default" id="llamarCliente">Llamar otro cliente</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-md-12">
+  <h2>COLA</h2>
+  <textarea  id='cola' class="form-control" rows="30" ></textarea >
+</div>
+
+<!-- JQUERY -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+<!-- BOOTSTRAP - Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- BOOTSTRAP - Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- BOOTSTRAP - Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<!-- SOCKET - IO -->
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
 <script>
-  var socket = io('http://localhost:3000');
+  var socket = io('http://localhost:3001');
   
-  socket.on('saludo', function (data) {
-    console.log('Alguien vino al super:' + data);
-    socket.emit('my other event', { my: 'data' });
-  });
-
   socket.on('nuevaCola', function (data) {
-    console.log('Parece que la cola cambia:' + data);
+   $("#cola").val(data);
+  });
+
+  socket.on('tomaID', function (data) {
+   $("#socketID").html(data);
   });
 
 
-  function saludoGeneral(){
-    socket.emit('saludoGeneral')
-  }
 
-  function hacerFila(){
+  $("#hacerFila").click(function() {
     socket.emit('hacerFila')
-  }
+  });
 
-  function atenderCliente(){
-    socket.emit('atenderCliente')
-  }
+  $("#salirFila").click(function() {
+    socket.emit('salirFila')
+  });
+
+
+
+  $("#atendiCliente").click(function() {
+    socket.emit('atendiCliente', $("#idCliente").val())
+    $("#idCliente").val('');
+  });
+
+  $("#llamarCliente").click(function() {
+    socket.emit('llamarCliente')
+  });
+
+
+
+
+  $("#abrirCaja").click(function() {
+    socket.emit('abrirCaja')
+  });
+
+  $("#cerrarCaja").click(function() {
+    socket.emit('cerrarCaja')
+  });
 
 </script>
 

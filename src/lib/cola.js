@@ -15,7 +15,7 @@ function Caja(nro){
 	}
 
 	this.getCliente = function(idCliente){
-		buscado = this.cola.find((cliente) => {
+		var buscado = this.cola.find((cliente) => {
 			if(cliente.id == idCliente)
 				return true
 			else
@@ -49,7 +49,7 @@ var colaManager = {
 	colaGeneral: [],
 
 	getCaja: function(nroCaja){
-		buscada = this.cajas.find((caja) => {
+		var buscada = this.cajas.find((caja) => {
 			if(caja.numero == nroCaja)
 				return true
 			else
@@ -60,7 +60,7 @@ var colaManager = {
 	},
 
 	getCliente: function(idCliente){
-		buscado = this.colaGeneral.find((cliente) => {
+		var buscado = this.colaGeneral.find((cliente) => {
 			if(cliente.id == idCliente)
 				return true
 			else
@@ -83,7 +83,7 @@ var colaManager = {
 	agregarCaja: function(nroCaja){
 
 		// Instanciamos una nueva caja y la agregamos a la lista de cajas disponibles
-		nuevaCaja = new Caja(nroCaja)
+		var nuevaCaja = new Caja(nroCaja)
 		this.cajas.push(nuevaCaja)
 
 		// Llamamos a MAXIMO_POR_CAJA personas para que se acerquen
@@ -96,16 +96,16 @@ var colaManager = {
 		// Si existe y está deshabilitada la habilitamos
 		// Si no existe la insertamos	
 
-		caja = getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja)
 
 		if(caja)
 			caja.atendiendo = true
 		else
-			agregarCaja(nroCaja)
+			this.agregarCaja(nroCaja)
 	},
 
 	cerrarCaja: function(nroCaja){
-		caja = getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja)
 
 		if(!caja)
 			return "WTF"
@@ -119,7 +119,7 @@ var colaManager = {
 			return "WTF"
 
 		// sacamos un cliente de la cola general
-		cliente = this.colaGeneral.shift()
+		var cliente = this.colaGeneral.shift()
 
 		// Si hay algun cliente 
 		if (cliente){
@@ -135,13 +135,13 @@ var colaManager = {
 	atendiCliente: function(nroCaja, idCliente){
 
 		// Buscamos la caja con ese nro de caja
-		caja = this.getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja)
 
 		if (!caja)
 			return "WTF"
 
 		// Buscamos la cliente dentro de la cola de esa caja
-		cliente = caja.getCliente(idCliente)
+		var cliente = caja.getCliente(idCliente)
 		
 		if (!cliente)
 			return "WTF2"
@@ -156,7 +156,7 @@ var colaManager = {
 	hacerFila: function(idCliente){
 
 		// Agrego al cliente a la cola general
-		nuevoCliente = new Cliente(idCliente)
+		var nuevoCliente = new Cliente(idCliente)
 
 		this.colaGeneral.push(nuevoCliente)
 
@@ -171,7 +171,7 @@ var colaManager = {
 
 		// Buscamos al cliente en la cola general
 		// Si está lo sacamos y FIN
-		cliente = this.getCliente(idCliente)
+		var cliente = this.getCliente(idCliente)
 		if (cliente)
 			this.sacarCliente(cliente)
 		else
@@ -185,7 +185,7 @@ var colaManager = {
 				{
 					caja.sacarCliente(cliente)
 					if(caja.puedeAtenderNuevoCliente())
-						llamarCliente(caja)
+						this.llamarCliente(caja)
 
 					return // TODO: Este return corta el forEach? (debería)
 				}
@@ -199,7 +199,7 @@ var colaManager = {
 
 		// Buscamos al cliente en la cola general
 		// Si está lo retrasamos
-		cliente = this.getCliente(idCliente)
+		var cliente = this.getCliente(idCliente)
 		if (cliente)
 		{	
 			
@@ -221,7 +221,7 @@ var colaManager = {
 	imprimir: function(){
 		// Imprime un resumen general del estado de las colas
 		
-		resumen = "----- COLA GENERAL ------ " + "\n" + "\n"
+		var resumen = "----- COLA GENERAL ------ " + "\n" + "\n"
 
 		this.colaGeneral.forEach((cliente) => {
 			resumen = resumen + "-" + cliente.id + "\n"
@@ -230,7 +230,7 @@ var colaManager = {
 		resumen = resumen + "\n"
 
 		this.cajas.forEach((caja) => {
-			resumen = resumen + `----- CAJA ${caja.numero} ------ ` + "\n" + "\n"
+			resumen = resumen + `----- CAJA ${caja.numero} ------ Atendiendo: ${caja.atendiendo}` + "\n" + "\n"
 
 			caja.cola.forEach((cliente) => {
 				resumen = resumen + "-" + cliente.id + "\n"
@@ -238,7 +238,9 @@ var colaManager = {
 		})
 
 		return resumen
-	}
+	},
+
+
 
 
 	// TODO: retrasarme, calcular tiempos de espera, etc

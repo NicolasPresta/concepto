@@ -3,9 +3,11 @@ import http from 'http'
 import express from 'express'
 //import semaforo from 'semaphore'
 //import Redis from 'ioredis'
-import colaManager from './lib/cola.js'
 import socketio from 'socket.io'
-import Log from 'log'
+
+import colaManager from './lib/cola.js'
+import log from './lib/console-log.js'
+
 
 
 // Definicion de constantes
@@ -17,7 +19,7 @@ const router = express.Router()
 //const sem = semaforo(1)
 //const redis = new Redis()
 const io = socketio(server)
-const log = new Log('info');
+
 
 
 const ROOM_EN_FILA = 1
@@ -41,13 +43,19 @@ app.use(router)
 
 // Conexiones por socket
 io.on('connection', (socket) => {
-  log.info(`Socket: Nueva conexión ${socket.id} en puerto ${port}`)
+  log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`)
 
-  socket.on('saludoGeneral', () => {
-      io.sockets.emit('saludo', socket.id)
+  socket.emit('tomaID', socket.id)
+
+  socket.on('disconnect', () =>{
+    log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`)
   })
 
-  socket.on('handshake', (gps) => {
+  socket.on('saludoGeneral', () => {
+    io.sockets.emit('saludo', socket.id)
+  })
+
+  socket.on('handshake', () => {
 
     // generar para el cliente un ID único
 
@@ -59,9 +67,12 @@ io.on('connection', (socket) => {
 
   })
 
-  socket.on('hacerFila', (gps) => {
+  socket.on('hacerFila', () => {
 
-    //socket.join(ROOM_EN_FILA)
+    socket.join(ROOM_EN_FILA)
+    colaManager.hacerFila(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+    socket.emit('nuevaCola', colaManager.imprimir())
     //cola.push(socket.id)
     //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
 
@@ -95,7 +106,11 @@ io.on('connection', (socket) => {
 
   })
 
-  socket.on('abandonarFila', () => {
+  socket.on('salirFila', () => {
+
+    colaManager.salirFila(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+    socket.emit('nuevaCola', colaManager.imprimir())
 
     // verificar si está haciendo la fila
 
@@ -111,7 +126,28 @@ io.on('connection', (socket) => {
 
   })
 
-  socket.on('atendiCliente', (caja, nroCliente) => {
+  socket.on('atendiCliente', (nroCliente) => {
+
+    colaManager.atendiCliente(socket.id, nroCliente)
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+    socket.emit('nuevaCola', colaManager.imprimir())
+
+    // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
+
+    // notificar a todos los integrantes de la fila y a las cajas
+
+    // grabar en base de datos el evento
+
+    // Grabar en REDIS la nueva cola
+
+  })
+
+  socket.on('llamarCliente', () => {
+
+    colaManager.llamarCliente(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+    socket.emit('nuevaCola', colaManager.imprimir())
+
     //cola.shift()
     //socket.leave(ROOM_EN_FILA)
     //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
@@ -126,23 +162,12 @@ io.on('connection', (socket) => {
 
   })
 
-  socket.on('llamarOtroCliente', (caja) => {
-    //cola.shift()
-    //socket.leave(ROOM_EN_FILA)
-    //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
-
-    // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
-
-    // notificar a todos los integrantes de la fila y a las cajas
-
-    // grabar en base de datos el evento
-
-    // Grabar en REDIS la nueva cola
-
-  })
-
-  socket.on('registrarCaja', () => {
+  socket.on('abrirCaja', () => {
    
+      colaManager.abrirCaja(socket.id)
+      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+      socket.emit('nuevaCola', colaManager.imprimir())
+
       // Generar un ID único para la caja
 
       // Devolverle el ID
@@ -158,8 +183,12 @@ io.on('connection', (socket) => {
       // Grabar en REDIS la nueva cola
   })
 
-  socket.on('bajaDeCaja', (nroCaja) => {
+  socket.on('cerrarCaja', () => {
    
+      colaManager.cerrarCaja(socket.id)
+      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
+      socket.emit('nuevaCola', colaManager.imprimir())
+
       // Quitar la caja al sistema
 
       // Rearmar las colas
