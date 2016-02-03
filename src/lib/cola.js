@@ -93,13 +93,21 @@ var colaManager = {
 	},
 
 	abrirCaja: function(nroCaja){
-		// Si existe y está deshabilitada la habilitamos
+		// Si existe y está deshabilitada la habilitamos, llamamos clientes para la caja recien habilitada, hasta completarla
 		// Si no existe la insertamos	
 
 		var caja = this.getCaja(nroCaja)
 
-		if(caja)
+		if(caja){
 			caja.atendiendo = true
+
+			var cantidadALlamar = MAXIMO_POR_CAJA - caja.cola.length()
+
+			// Llamamos a MAXIMO_POR_CAJA personas para que se acerquen
+			for (let i = MAXIMO_POR_CAJA; i > 0; i--) {
+				this.llamarCliente(nuevaCaja)
+			}
+		}
 		else
 			this.agregarCaja(nroCaja)
 	},
@@ -130,6 +138,15 @@ var colaManager = {
 			// Y le asignamos el número de la caja a la cual tiene que ir
 			cliente.caja = caja.numero
 		}
+	},
+
+	llamarOtroCliente: function(idCaja) {
+	 	var caja = this.getCaja(idCaja)
+
+	 	if(!caja)
+	 		return "WTF"
+
+	 	this.llamarCliente(caja)
 	},
 
 	atendiCliente: function(nroCaja, idCliente){

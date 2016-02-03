@@ -148,9 +148,9 @@ io.on('connection', (socket) => {
 
   })
 
-  socket.on('llamarCliente', () => {
+  socket.on('llamarOtroCliente', () => {
 
-    colaManager.llamarCliente(socket.id)
+    colaManager.llamarOtroCliente(socket.id)
     socket.broadcast.emit('nuevaCola', colaManager.imprimir())
     socket.emit('nuevaCola', colaManager.imprimir())
 
