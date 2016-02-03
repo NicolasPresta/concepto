@@ -1,6 +1,9 @@
+// TODO: retrasarme, calcular tiempos de espera, etc
+
 const MAXIMO_POR_CAJA = 2;
 const RETRASO_MINIMO = 2;
 
+// Clase CAJA
 function Caja(nro){
 
 	this.numero = nro;
@@ -29,12 +32,14 @@ function Caja(nro){
 }
 
 
+// Clase CLIENTE
 function Cliente(id){
 	this.id = id;
 	this.retrasoPersonas = RETRASO_MINIMO
 }
 
 
+// Manager de COLAS
 var colaManager = {
 
 	cajas: [],
@@ -75,13 +80,21 @@ var colaManager = {
 	},
 
 	abrirCaja: function(nroCaja){
-		// Si existe y está deshabilitada la habilitamos
+		// Si existe y está deshabilitada la habilitamos, llamamos clientes para la caja recien habilitada, hasta completarla
 		// Si no existe la insertamos	
 
 		var caja = this.getCaja(nroCaja);
 
-		if(caja)
-			caja.atendiendo = true;
+		if(caja){
+			caja.atendiendo = true
+
+			var cantidadALlamar = MAXIMO_POR_CAJA - caja.cola.length
+
+			// Llamamos a MAXIMO_POR_CAJA personas para que se acerquen
+			for (let i = cantidadALlamar; i > 0; i--) {
+				this.llamarCliente(caja)
+			}
+		}
 		else
 			this.agregarCaja(nroCaja)
 	},
@@ -114,6 +127,15 @@ var colaManager = {
 		}
 	},
 
+	llamarOtroCliente: function(idCaja) {
+	 	var caja = this.getCaja(idCaja)
+
+	 	if(!caja)
+	 		return "WTF"
+
+	 	this.llamarCliente(caja)
+	},
+
 	atendiCliente: function(nroCaja, idCliente){
 
 		// Buscamos la caja con ese nro de caja
@@ -142,11 +164,30 @@ var colaManager = {
 
 		this.colaGeneral.push(nuevoCliente);
 
+		var cajasQuePuedenAtender = []
+
 		// Me fijo si alguna caja está en condiciones de atender a un cliente nuevo
 		this.cajas.forEach((caja) => {
 			if(caja.puedeAtenderNuevoCliente())
-				this.llamarCliente(caja)
+				cajasQuePuedenAtender.push(caja)
 		})
+
+		// De entre todas las cajas que pueden atender, tomo la que menos clientes tenga en su cola
+		var cajaElegida
+
+		if (cajasQuePuedenAtender.length > 0)
+			cajaElegida = cajasQuePuedenAtender[0]
+
+		cajasQuePuedenAtender.forEach((caja) =>{
+			if(cajaElegida.cola.length > caja.cola.length)
+				cajaElegida = caja
+		})
+
+		if (!cajaElegida)
+			return "WTF"
+
+		this.llamarCliente(cajaElegida)
+
 	},
 
 	salirFila: function(idCliente){
@@ -200,6 +241,8 @@ var colaManager = {
 		}
 	},
 
+
+	// EN desuso
 	imprimir: function(){
 		// Imprime un resumen general del estado de las colas
 		
@@ -222,11 +265,28 @@ var colaManager = {
 		return resumen
 	}
 
+	getObjetoColas: function(){
+		// Retorna un objeto con toda la info que necesitan los clientes para saber que hacer
+		// NMR: Por ahora no es necesario, se puede retornar todo el manager y listo.
+		var objeto = {}
+		objeto.colaGeneral = this.colaGeneral
+		objeto.cajas = []
 
+		this.cajas.forEach((caja) => {
 
+			var cajaNueva = {}
 
-	// TODO: retrasarme, calcular tiempos de espera, etc
-};
+			cajaNueva.numero = caja.numero
+			cajaNueva.cola = caja.cola
+			cajaNueva.atendiendo = caja.atendiendo
+
+			objeto.cajas.push(cajaNueva)
+		})
+
+		return objeto
+	}
+
+}
 
 
 export default colaManager

@@ -90,10 +90,10 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('hacerFila', () => {
 
-    socket.join(ROOM_EN_FILA);
-    colaManager.hacerFila(socket.id);
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-    socket.emit('nuevaCola', colaManager.imprimir());
+    socket.join(ROOM_EN_FILA)
+    colaManager.hacerFila(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
     //cola.push(socket.id)
     //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
 
@@ -129,9 +129,9 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('salirFila', () => {
 
-    colaManager.salirFila(socket.id);
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-    socket.emit('nuevaCola', colaManager.imprimir());
+    colaManager.salirFila(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     // verificar si está haciendo la fila
 
@@ -149,9 +149,9 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('atendiCliente', (nroCliente) => {
 
-    colaManager.atendiCliente(socket.id, nroCliente);
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-    socket.emit('nuevaCola', colaManager.imprimir());
+    colaManager.atendiCliente(socket.id, nroCliente)
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
 
@@ -163,11 +163,11 @@ io.sockets.on('connection', (socket) => {
 
   });
 
-  socket.on('llamarCliente', () => {
+  socket.on('llamarOtroCliente', () => {
 
-    colaManager.llamarCliente(socket.id);
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-    socket.emit('nuevaCola', colaManager.imprimir());
+    colaManager.llamarOtroCliente(socket.id)
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     //cola.shift()
     //socket.leave(ROOM_EN_FILA)
@@ -185,9 +185,9 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('abrirCaja', () => {
    
-      colaManager.abrirCaja(socket.id);
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-      socket.emit('nuevaCola', colaManager.imprimir());
+      colaManager.abrirCaja(socket.id)
+      socket.broadcast.emit('nuevaCola', colaManager)
+      socket.emit('nuevaCola', colaManager)
 
       // Generar un ID único para la caja
 
@@ -206,9 +206,9 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('cerrarCaja', () => {
    
-      colaManager.cerrarCaja(socket.id);
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir());
-      socket.emit('nuevaCola', colaManager.imprimir());
+      colaManager.cerrarCaja(socket.id)
+      socket.broadcast.emit('nuevaCola', colaManager)
+      socket.emit('nuevaCola', colaManager)
 
       // Quitar la caja al sistema
 
