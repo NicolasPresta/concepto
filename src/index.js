@@ -77,8 +77,8 @@ io.on('connection', (socket) => {
 
     socket.join(ROOM_EN_FILA)
     colaManager.hacerFila(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
     //cola.push(socket.id)
     //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
 
@@ -115,8 +115,8 @@ io.on('connection', (socket) => {
   socket.on('salirFila', () => {
 
     colaManager.salirFila(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     // verificar si está haciendo la fila
 
@@ -135,8 +135,8 @@ io.on('connection', (socket) => {
   socket.on('atendiCliente', (nroCliente) => {
 
     colaManager.atendiCliente(socket.id, nroCliente)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
 
@@ -151,8 +151,8 @@ io.on('connection', (socket) => {
   socket.on('llamarOtroCliente', () => {
 
     colaManager.llamarOtroCliente(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
 
     //cola.shift()
     //socket.leave(ROOM_EN_FILA)
@@ -171,8 +171,8 @@ io.on('connection', (socket) => {
   socket.on('abrirCaja', () => {
    
       colaManager.abrirCaja(socket.id)
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-      socket.emit('nuevaCola', colaManager.imprimir())
+      socket.broadcast.emit('nuevaCola', colaManager)
+      socket.emit('nuevaCola', colaManager)
 
       // Generar un ID único para la caja
 
@@ -192,8 +192,8 @@ io.on('connection', (socket) => {
   socket.on('cerrarCaja', () => {
    
       colaManager.cerrarCaja(socket.id)
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-      socket.emit('nuevaCola', colaManager.imprimir())
+      socket.broadcast.emit('nuevaCola', colaManager)
+      socket.emit('nuevaCola', colaManager)
 
       // Quitar la caja al sistema
 
