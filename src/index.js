@@ -51,13 +51,16 @@ app.use('/secure', (req, res, next) => {
 	}
 });
 
-app.use(express.static('Cliente'))
+
 
 // Conexiones por socket
 io.set('authorization', socketJWT.authorize({
 	secret: APP_SECRET,
 	handshake: true
 }));
+
+
+app.use(express.static('Cliente'))
 
 io.sockets.on('connection', (socket) => {
   log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
@@ -80,7 +83,6 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('hacerFila', () => {
 
-    socket.join(ROOM_EN_FILA)
     colaManager.hacerFila(socket.id)
     socket.broadcast.emit('nuevaCola', colaManager)
     socket.emit('nuevaCola', colaManager)
