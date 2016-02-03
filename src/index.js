@@ -4,81 +4,96 @@ import express from 'express'
 //import semaforo from 'semaphore'
 //import Redis from 'ioredis'
 import socketio from 'socket.io'
+import jwt from "jsonwebtoken"
+import socketJWT from "socketio-jwt"
 
 import colaManager from './lib/cola.js'
+import secureManager from './lib/secure'
 import log from './lib/console-log.js'
 
 
-
 // Definicion de constantes
-const app = express()
-const server = http.createServer(app)
+const app = express();
+const server = http.createServer(app);
 //const port = process.env.PORT || 3000
-const port = process.argv[2] || 3001
-const router = express.Router()
+const port = process.argv[2] || 3001;
+const router = express.Router();
 //const sem = semaforo(1)
 //const redis = new Redis()
-const io = socketio(server)
+const io = socketio(server);
 
+const ROOM_EN_FILA = 1;
 
+const cola = [];
 
-const ROOM_EN_FILA = 1
-
-const cola = []
+const APP_SECRET = "1_4m_@_53Cr3T!";
 
 // Puntos de entrada REST
+router.post('/handshake', (req, res) => {
+	//TODO: verificar de algún modo la autenticidad del uuid
+	let uuid = req.body.uuid;
+	let response = {
+		success: true,
+		token: secureManager.handShake(uuid)
+	};
+	res.send(200)(response);
+});
+
 router.get('/push/:param', (req, res) => {
-	let dato = req.params.param
-   	cola.push(dato)
+	let dato = req.params.param;
+   	cola.push(dato);
 	res.json({cola: cola})
-})
+});
 
 router.get('/shift', (req, res) => {	
-  	let elemento = cola.shift()
+  	let elemento = cola.shift();
 	res.json({cola: cola, elemento: elemento})
-})
+});
 
-app.use(router)
-
+app.use(router);
+app.use('/secure', (req, res, next) => {
+	//Definir en donde va a llegar el token
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+	var checkResponse = secureManager.getToken(token);
+	if (checkResponse.success){
+		req.decoded = checkResponse.data;
+		next();
+	} else {
+		res.send(checkResponse.code)(checkResponse);
+	}
+});
 
 // Conexiones por socket
-io.on('connection', (socket) => {
-  log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`)
+io.set('authorization', socketJWT.authorize({
+	secret: APP_SECRET,
+	handshake: true
+}));
+
+io.sockets.on('connection', (socket) => {
+  log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
 
   // Uso el id del socket como identificador único, claramente eso no puede usarse en la realidad, ya que
   // un cliente podria conectarse, desconectarse y volverse a conectar con otro socket.id, pero seguiria siendo el mismo cliente.
-  socket.emit('tomaID', socket.id)
+  socket.emit('tomaID', socket.id);
 
   socket.on('disconnect', () =>{
-    log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`)
+    log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`);
 
     // Esto abria que controlarlo, pero para prototipar lo dejo asi:
-    colaManager.salirFila(socket.id)
+    colaManager.salirFila(socket.id);
     colaManager.cerrarCaja(socket.id)
-  })
+  });
 
   socket.on('saludoGeneral', () => {
     io.sockets.emit('saludo', socket.id)
-  })
-
-  socket.on('handshake', () => {
-
-    // generar para el cliente un ID único
-
-    // retornarle el ID
-
-    // grabar en base de datos el evento
-
-    // Grabar en REDIS la nueva cola
-
-  })
+  });
 
   socket.on('hacerFila', () => {
 
-    socket.join(ROOM_EN_FILA)
-    colaManager.hacerFila(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    socket.join(ROOM_EN_FILA);
+    colaManager.hacerFila(socket.id);
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+    socket.emit('nuevaCola', colaManager.imprimir());
     //cola.push(socket.id)
     //socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
 
@@ -94,7 +109,7 @@ io.on('connection', (socket) => {
 
     // Grabar en REDIS la nueva cola
 
-  })
+  });
 
   socket.on('retrasarme', () => {
 
@@ -110,13 +125,13 @@ io.on('connection', (socket) => {
 
     // Grabar en REDIS la nueva cola
 
-  })
+  });
 
   socket.on('salirFila', () => {
 
-    colaManager.salirFila(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    colaManager.salirFila(socket.id);
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+    socket.emit('nuevaCola', colaManager.imprimir());
 
     // verificar si está haciendo la fila
 
@@ -130,13 +145,13 @@ io.on('connection', (socket) => {
 
     // Grabar en REDIS la nueva cola
 
-  })
+  });
 
   socket.on('atendiCliente', (nroCliente) => {
 
-    colaManager.atendiCliente(socket.id, nroCliente)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    colaManager.atendiCliente(socket.id, nroCliente);
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+    socket.emit('nuevaCola', colaManager.imprimir());
 
     // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
 
@@ -146,13 +161,13 @@ io.on('connection', (socket) => {
 
     // Grabar en REDIS la nueva cola
 
-  })
+  });
 
   socket.on('llamarCliente', () => {
 
-    colaManager.llamarCliente(socket.id)
-    socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-    socket.emit('nuevaCola', colaManager.imprimir())
+    colaManager.llamarCliente(socket.id);
+    socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+    socket.emit('nuevaCola', colaManager.imprimir());
 
     //cola.shift()
     //socket.leave(ROOM_EN_FILA)
@@ -166,13 +181,13 @@ io.on('connection', (socket) => {
 
     // Grabar en REDIS la nueva cola
 
-  })
+  });
 
   socket.on('abrirCaja', () => {
    
-      colaManager.abrirCaja(socket.id)
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-      socket.emit('nuevaCola', colaManager.imprimir())
+      colaManager.abrirCaja(socket.id);
+      socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+      socket.emit('nuevaCola', colaManager.imprimir());
 
       // Generar un ID único para la caja
 
@@ -187,13 +202,13 @@ io.on('connection', (socket) => {
       // grabar en base de datos el evento
 
       // Grabar en REDIS la nueva cola
-  })
+  });
 
   socket.on('cerrarCaja', () => {
    
-      colaManager.cerrarCaja(socket.id)
-      socket.broadcast.emit('nuevaCola', colaManager.imprimir())
-      socket.emit('nuevaCola', colaManager.imprimir())
+      colaManager.cerrarCaja(socket.id);
+      socket.broadcast.emit('nuevaCola', colaManager.imprimir());
+      socket.emit('nuevaCola', colaManager.imprimir());
 
       // Quitar la caja al sistema
 
@@ -206,8 +221,8 @@ io.on('connection', (socket) => {
       // Grabar en REDIS la nueva cola
   })
 
-})
+});
 
 
 // Nos ponemos a escuchar... hello! 
-server.listen(port, () => log.info(`Servidor Iniciado en puerto ${port}`))
+server.listen(port, () => log.info(`Servidor Iniciado en puerto ${port}`));

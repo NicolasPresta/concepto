@@ -17,7 +17,7 @@ colors.setTheme({
   critical: 'bgRed',
   alert: 'bgRed',
   emergency: 'bgMagenta'
-})
+});
 
 
 var colorLoger = {

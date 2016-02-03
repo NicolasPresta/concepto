@@ -1,32 +1,24 @@
-const MAXIMO_POR_CAJA = 2
-const RETRASO_MINIMO = 2
+const MAXIMO_POR_CAJA = 2;
+const RETRASO_MINIMO = 2;
 
 function Caja(nro){
 
-	this.numero = nro
-	this.cola = []
-	this.atendiendo = true
+	this.numero = nro;
+	this.cola = [];
+	this.atendiendo = true;
 
 	this.puedeAtenderNuevoCliente = function(){
-		if (this.cola.length < MAXIMO_POR_CAJA & this.atendiendo)
-			return true
-		else
-			return false
-	}
+		return this.cola.length < MAXIMO_POR_CAJA & this.atendiendo;
+	};
 
 	this.getCliente = function(idCliente){
-		var buscado = this.cola.find((cliente) => {
-			if(cliente.id == idCliente)
-				return true
-			else
-				return false
-		})
-
-		return buscado
-	}
+		return this.cola.find((cliente) => {
+			return cliente.id == idCliente;
+		});
+	};
 
 	this.sacarCliente = function(cliente){
-		var index = this.cola.indexOf(cliente)
+		var index = this.cola.indexOf(cliente);
 
 		if (index > -1) {
     		 this.cola.splice(index, 1)
@@ -38,7 +30,7 @@ function Caja(nro){
 
 
 function Cliente(id){
-	this.id = id
+	this.id = id;
 	this.retrasoPersonas = RETRASO_MINIMO
 }
 
@@ -49,29 +41,19 @@ var colaManager = {
 	colaGeneral: [],
 
 	getCaja: function(nroCaja){
-		var buscada = this.cajas.find((caja) => {
-			if(caja.numero == nroCaja)
-				return true
-			else
-				return false
-		})
-
-		return buscada
+		return this.cajas.find((caja) => {
+			return caja.numero == nroCaja;
+		});
 	},
 
 	getCliente: function(idCliente){
-		var buscado = this.colaGeneral.find((cliente) => {
-			if(cliente.id == idCliente)
-				return true
-			else
-				return false
-		})
-
-		return buscado
+		return this.colaGeneral.find((cliente) => {
+			return cliente.id == idCliente;
+		});
 	},
 
 	sacarCliente: function(cliente){
-		var index = this.colaGeneral.indexOf(cliente)
+		var index = this.colaGeneral.indexOf(cliente);
 
 		if (index > -1) {
     		 this.colaGeneral.splice(index, 1)
@@ -83,8 +65,8 @@ var colaManager = {
 	agregarCaja: function(nroCaja){
 
 		// Instanciamos una nueva caja y la agregamos a la lista de cajas disponibles
-		var nuevaCaja = new Caja(nroCaja)
-		this.cajas.push(nuevaCaja)
+		var nuevaCaja = new Caja(nroCaja);
+		this.cajas.push(nuevaCaja);
 
 		// Llamamos a MAXIMO_POR_CAJA personas para que se acerquen
 		for (let i = MAXIMO_POR_CAJA; i > 0; i--) {
@@ -96,19 +78,19 @@ var colaManager = {
 		// Si existe y está deshabilitada la habilitamos
 		// Si no existe la insertamos	
 
-		var caja = this.getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja);
 
 		if(caja)
-			caja.atendiendo = true
+			caja.atendiendo = true;
 		else
 			this.agregarCaja(nroCaja)
 	},
 
 	cerrarCaja: function(nroCaja){
-		var caja = this.getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja);
 
 		if(!caja)
-			return "WTF"
+			return "WTF";
 
 		caja.atendiendo = false
 	},
@@ -116,16 +98,16 @@ var colaManager = {
 	llamarCliente: function(caja){
 
 		if(!caja.atendiendo)
-			return "WTF"
+			return "WTF";
 
 		// sacamos un cliente de la cola general
-		var cliente = this.colaGeneral.shift()
+		var cliente = this.colaGeneral.shift();
 
 		// Si hay algun cliente 
 		if (cliente){
 
 			// Lo agregamos a la cola de la caja
-			caja.cola.push(cliente)
+			caja.cola.push(cliente);
 
 			// Y le asignamos el número de la caja a la cual tiene que ir
 			cliente.caja = caja.numero
@@ -135,19 +117,19 @@ var colaManager = {
 	atendiCliente: function(nroCaja, idCliente){
 
 		// Buscamos la caja con ese nro de caja
-		var caja = this.getCaja(nroCaja)
+		var caja = this.getCaja(nroCaja);
 
 		if (!caja)
-			return "WTF"
+			return "WTF";
 
 		// Buscamos la cliente dentro de la cola de esa caja
-		var cliente = caja.getCliente(idCliente)
+		var cliente = caja.getCliente(idCliente);
 		
 		if (!cliente)
-			return "WTF2"
+			return "WTF2";
 
 		// Sacamos al cliente de la caja
-		caja.sacarCliente(cliente)
+		caja.sacarCliente(cliente);
 
 		// Llamamos uno nuevo
 		this.llamarCliente(caja)
@@ -156,9 +138,9 @@ var colaManager = {
 	hacerFila: function(idCliente){
 
 		// Agrego al cliente a la cola general
-		var nuevoCliente = new Cliente(idCliente)
+		var nuevoCliente = new Cliente(idCliente);
 
-		this.colaGeneral.push(nuevoCliente)
+		this.colaGeneral.push(nuevoCliente);
 
 		// Me fijo si alguna caja está en condiciones de atender a un cliente nuevo
 		this.cajas.forEach((caja) => {
@@ -171,21 +153,21 @@ var colaManager = {
 
 		// Buscamos al cliente en la cola general
 		// Si está lo sacamos y FIN
-		var cliente = this.getCliente(idCliente)
+		var cliente = this.getCliente(idCliente);
 		if (cliente)
-			this.sacarCliente(cliente)
+			this.sacarCliente(cliente);
 		else
 		{
 			// SI no:
 			// Buscamos al cliente en las colas de las cajas
 			// Si está lo sacamos y llamamos a alguien más para esa caja
 			this.cajas.forEach((caja) => {
-				cliente = caja.getCliente(idCliente)
+				cliente = caja.getCliente(idCliente);
 				if(cliente)
 				{
-					caja.sacarCliente(cliente)
+					caja.sacarCliente(cliente);
 					if(caja.puedeAtenderNuevoCliente())
-						this.llamarCliente(caja)
+						this.llamarCliente(caja);
 
 					return // TODO: Este return corta el forEach? (debería)
 				}
@@ -199,14 +181,14 @@ var colaManager = {
 
 		// Buscamos al cliente en la cola general
 		// Si está lo retrasamos
-		var cliente = this.getCliente(idCliente)
+		var cliente = this.getCliente(idCliente);
 		if (cliente)
 		{	
 			
-			cantidadLugaresARetrasar = cliente.retrasoPersonas
+			cantidadLugaresARetrasar = cliente.retrasoPersonas;
 
 			// Incrementamos la cantidad de personas que van a adelantarsele si se vuelve a atrasar
-			cliente.retrasoPersonas = cliente.retrasoPersonas + 1
+			cliente.retrasoPersonas = cliente.retrasoPersonas + 1;
 
 			//retrasarNLugares(this.colaGeneral, cliente, cantidadLugaresARetrasar)
 		}
@@ -221,30 +203,30 @@ var colaManager = {
 	imprimir: function(){
 		// Imprime un resumen general del estado de las colas
 		
-		var resumen = "----- COLA GENERAL ------ " + "\n" + "\n"
+		var resumen = "----- COLA GENERAL ------ " + "\n" + "\n";
 
 		this.colaGeneral.forEach((cliente) => {
 			resumen = resumen + "-" + cliente.id + "\n"
-		})
+		});
 
-		resumen = resumen + "\n"
+		resumen = resumen + "\n";
 
 		this.cajas.forEach((caja) => {
-			resumen = resumen + `----- CAJA ${caja.numero} ------ Atendiendo: ${caja.atendiendo}` + "\n" + "\n"
+			resumen = resumen + `----- CAJA ${caja.numero} ------ Atendiendo: ${caja.atendiendo}` + "\n" + "\n";
 
 			caja.cola.forEach((cliente) => {
 				resumen = resumen + "-" + cliente.id + "\n"
 			})
-		})
+		});
 
 		return resumen
-	},
+	}
 
 
 
 
 	// TODO: retrasarme, calcular tiempos de espera, etc
-}
+};
 
 
 export default colaManager
