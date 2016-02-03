@@ -8,6 +8,10 @@
 <body>
 
 <div class="col-md-4">
+  <h5 id="serverURL"></h2>
+</div>
+
+<div class="col-md-4">
   <h2>Yo soy</h2>
   <h3 id="socketID"></h2>
 </div>
@@ -26,15 +30,21 @@
     </div>
   </div>
   <div id="menuCaja" class="tab-pane fade">
-    <div class="col-md-12">
+    <div class="row">
       <button type="button" class="btn btn-lg btn-success" id="abrirCaja">Registrar caja</button>
       <button type="button" class="btn btn-lg btn-danger" id="cerrarCaja">Baja de caja</button>
     </div>
 
-    <div class="col-md-12">
-      <button type="button" class="btn btn-lg btn-default" id="atendiCliente">Atendí Cliente</button>
-      <input type="text" class="form-control" id="idCliente">
-      <button type="button" class="btn btn-lg btn-default" id="llamarCliente">Llamar otro cliente</button>
+    <div class="row">
+      <div class="col-md-4">
+        <button type="button" class="btn btn-lg btn-default" id="atendiCliente">Atendí Cliente</button>
+      </div>
+      <div class="col-md-2">
+        <input type="text" class="form-control" id="idCliente">
+      </div>
+      <div class="col-md-4">
+        <button type="button" class="btn btn-lg btn-default" id="llamarCliente">Llamar otro cliente</button>
+      </div>
     </div>
   </div>
 </div>
@@ -61,8 +71,12 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <script>
-  var socket = io('http://localhost:3001');
+
+  var url = 'http://localhost:3001';
+  var socket = io(url);
   
+  $('#serverURL').html("Servidor: " + url);
+
   socket.on('nuevaCola', function (data) {
    $("#cola").val(data);
   });
