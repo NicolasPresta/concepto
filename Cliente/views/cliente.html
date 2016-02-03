@@ -1,13 +1,20 @@
 <div>
   <div class="page-header">
-    <h1>Cliente <small class="pull-right">ID: <span class="badge">{{socketID}}</span> </small></h1>
+    <h1>Cliente {{socketID}} </h1>
     <!--<h2 ng-if="type"><span class="label type-{{type | lowercase}}">{{type}}</span></h2> -->
   </div>
 
 
-  <button type="submit" class="btn btn-lg">Hacer fila</button>
 
-  
+  <button ng-show="!estado.estaEnFila" ng-click="hacerFila()" type="submit" class="btn btn-lg">Hacer fila</button>
+
+  <div ng-show="estado.estaEnFilaGeneral" class="panel-heading"> Perfecto! Ya estas en la fila. Pronto te avisaremos a que caja ir... </div>
+  <div ng-show="estado.estaEnFilaGeneral" class="panel-heading"> Gente delante tuyo: {{estado.genteDelante}} </div>
+  <div ng-show="estado.estaEnFilaCaja" class="panel-heading"> Ya te podemos atender, ve a la caja {{estado.nroCaja}}  :) </div>
+
+  <button ng-show="estado.estaEnFila" ng-click="salirFila()" type="submit" class="btn btn-lg">Salir fila</button>
+
+
   <textarea ng-model="colaText" class="form-control"></textarea>
 
 

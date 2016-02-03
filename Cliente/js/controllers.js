@@ -2,10 +2,12 @@
 
   angular.module('fila.controllers', [])
     .controller('ClienteController', ['$scope', '$routeParams', 'socket', function ($scope, $routeParams, socket) {
-      
+    
       var nro = $routeParams.nro;
       // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
       // TODO: implementar la conexion de un cliente con un número dado.
+
+      socket.connect('http://localhost:3001');
 
       $scope.hacerFila = function() {
         socket.emit('hacerFila');
@@ -15,11 +17,11 @@
         socket.emit('salirFila');
       };
 
-
       socket.on('nuevaCola', function(data) {
         $scope.$apply(function () {
           $scope.cola = data;
           $scope.colaText = imprimir(data);
+          $scope.estado = obtenerEstado(data, $scope.socketID);
         });
       });
 
@@ -28,6 +30,44 @@
           $scope.socketID = data;
         });
       });
+
+      function obtenerEstado(data, id)
+      {
+        var retorno = {
+        estaEnFila: false,
+        estaEnFilaGeneral: false,
+        estaEnFilaCaja: false,
+        nroCaja: null,
+        genteDelante: null
+        }
+
+        var ix = 0;
+        var cantidadGenteColaGeneral =  data.colaGeneral.length;
+
+        data.colaGeneral.forEach((cliente) => {
+          if(cliente.id == id){
+            ix = ix + 1;
+            retorno.estaEnFila = true;
+            retorno.estaEnFilaGeneral = true;
+            retorno.genteDelante = cantidadGenteColaGeneral - ix;
+          }
+        });
+
+
+        if(!retorno.estaEnFila){
+          data.cajas.forEach((caja) => {
+            caja.cola.forEach((cliente) => {
+              if(cliente.id == id){
+                retorno.estaEnFila = true;
+                retorno.estaEnFilaCaja = true;
+                retorno.nroCaja = caja.numero;
+              }
+            })
+          });
+        }
+
+        return retorno;
+      };
 
       function imprimir(data)
       {

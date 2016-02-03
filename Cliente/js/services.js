@@ -4,10 +4,10 @@
 
     // Socket Service
     .factory('socket', ['$rootScope', function($rootScope) {
-      var url = 'http://localhost:3001';
-      var socket = io(url);
-
       return {
+        connect: function(url) {
+          socket = io(url);
+        },
         on: function(eventName, callback){
           socket.on(eventName, callback);
         },

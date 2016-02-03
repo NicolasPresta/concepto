@@ -25,7 +25,7 @@ const io = socketio(server);
 
 const APP_SECRET = "1_4m_@_53Cr3T!";
 
-
+/*
 // Puntos de entrada REST
 router.post('/handshake', (req, res) => {
 	//TODO: verificar de algún modo la autenticidad del uuid
@@ -59,7 +59,7 @@ io.set('authorization', socketJWT.authorize({
 	handshake: true
 }));
 
-
+*/
 app.use(express.static('Cliente'))
 
 io.sockets.on('connection', (socket) => {
