@@ -263,8 +263,9 @@ var colaManager = {
 		});
 
 		return resumen
-	}
+	},
 
+	// EN desuso
 	getObjetoColas: function(){
 		// Retorna un objeto con toda la info que necesitan los clientes para saber que hacer
 		// NMR: Por ahora no es necesario, se puede retornar todo el manager y listo.

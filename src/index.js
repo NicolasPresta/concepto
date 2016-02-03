@@ -22,11 +22,9 @@ const router = express.Router();
 //const redis = new Redis()
 const io = socketio(server);
 
-const ROOM_EN_FILA = 1;
-
-const cola = [];
 
 const APP_SECRET = "1_4m_@_53Cr3T!";
+
 
 // Puntos de entrada REST
 router.post('/handshake', (req, res) => {
@@ -39,16 +37,6 @@ router.post('/handshake', (req, res) => {
 	res.send(200)(response);
 });
 
-router.get('/push/:param', (req, res) => {
-	let dato = req.params.param;
-   	cola.push(dato);
-	res.json({cola: cola})
-});
-
-router.get('/shift', (req, res) => {	
-  	let elemento = cola.shift();
-	res.json({cola: cola, elemento: elemento})
-});
 
 app.use(router);
 app.use('/secure', (req, res, next) => {
@@ -62,6 +50,8 @@ app.use('/secure', (req, res, next) => {
 		res.send(checkResponse.code)(checkResponse);
 	}
 });
+
+app.use(express.static('Cliente'))
 
 // Conexiones por socket
 io.set('authorization', socketJWT.authorize({
