@@ -1,41 +1,18 @@
 <div>
   <div class="page-header">
-    <h1>Cliente {{socketID}} </h1>
-    <!--<h2 ng-if="type"><span class="label type-{{type | lowercase}}">{{type}}</span></h2> -->
+    <h1>Cliente: {{socketID}} </h1>
   </div>
-
-
 
   <button ng-show="!estado.estaEnFila" ng-click="hacerFila()" type="submit" class="btn btn-lg">Hacer fila</button>
 
   <div ng-show="estado.estaEnFilaGeneral" class="panel-heading"> Perfecto! Ya estas en la fila. Pronto te avisaremos a que caja ir... </div>
   <div ng-show="estado.estaEnFilaGeneral" class="panel-heading"> Gente delante tuyo: {{estado.genteDelante}} </div>
-  <div ng-show="estado.estaEnFilaCaja" class="panel-heading"> Ya te podemos atender, ve a la caja {{estado.nroCaja}}  :) </div>
+  <div ng-show="estado.estaEnFilaCaja" class="panel-heading"> Ya te podemos atender, acercate a la caja {{estado.nroCaja}}, gracias! </div>
 
   <button ng-show="estado.estaEnFila" ng-click="salirFila()" type="submit" class="btn btn-lg">Salir fila</button>
 
+  <div ng-show="estado.atendido" class="panel-heading"> Muchas gracias por tu compra, te esperamos pronto =) </div>
 
   <textarea ng-model="colaText" class="form-control"></textarea>
-
-
-  <!-- <div class="row" ng-repeat="group in groupped">
-    <div class="col-lg-3" ng-repeat="pokemon in group">
-      <div class="pokemon panel panel-primary">
-        <div class="panel-heading">
-          <pokemon-name></pokemon-name>
-        </div>
-        <div class="panel-body">
-          <a href="/#pokemon/{{pokemon.name | normalize}}">
-            <pokemon-image></pokemon-image>
-          </a>
-        </div>
-        <div class="panel-footer">
-          <div class="text-center">
-            <pokemon-type></pokemon-type>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>-->
 
 </div>

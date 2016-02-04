@@ -149,11 +149,11 @@ io.sockets.on('connection', (socket) => {
 
 	socket.on('atendiCliente', (nroCliente) => {
 
-		colaManager.atendiCliente(socket.id, nroCliente)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
-
-		// Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
+    colaManager.atendiCliente(socket.id, nroCliente)
+    socket.broadcast.emit('nuevaCola', colaManager)
+    socket.emit('nuevaCola', colaManager)
+    socket.to(nroCliente).emit('clienteAtendido');
+    // Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
 
 		// notificar a todos los integrantes de la fila y a las cajas
 

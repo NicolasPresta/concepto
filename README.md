@@ -7,13 +7,28 @@ Para pruebas de concepto varias...
 
 ```
 npm install
+npm install -g grunt-cli
 ```
 
 ### Ejecutar
 
 ```
-npm start
+1° - Cambiar la URL donde corre el servidor en el método: getServerURL, de Angular.
+2° - npm start
+3° - Abrir CAJAS: desde el explorador http://192.168.0.102:3001/#/caja
+4° - Abrir CLIENTES: desde el explorador http://192.168.0.102:3001/#/cliente
+
+NOTA: para que funcione tuve que comentar todo lo relacionado a la seguridad, de otra forma los clientes no se conectaban al socket...
 ```
+
+### Levantar cliente con grunt
+
+```
+1° - asegurarse de tener npm install -g grunt-cli
+2° - npm run client: esto inicia un servidor Grunt sirviendo los archivos de /Cliente
+3° - desde el entorno local se pueden abrir clientes y cajas, desde el explorador:  http://localhost:9000
+```
+
 
 ### Ejecutar en otro puerto *(Ej: 3001)*
 

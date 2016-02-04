@@ -19,9 +19,13 @@
     "socketio-jwt": "^4.3.4"
   },
   "devDependencies": {
-    "babel-cli": "^6.2.0"
+    "babel-cli": "^6.2.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-connect": "^0.8.0",
+    "grunt-contrib-watch": "^0.6.1"
   },
   "scripts": {
+    "client": "grunt",
     "dist": "babel src/*.js src/**/*.js --out-dir dist --presets es2015",
     "serve": "node dist/src",
     "start": "npm run dist && npm run serve"
