@@ -2,6 +2,7 @@
 
 Para pruebas de concepto varias... 
 
+##  [TODO LIST: acá!](TODO.md)
 
 ### Instalación
 
