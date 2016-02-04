@@ -13,21 +13,25 @@
 
     $routeProvider
       .when('/', {
+        templateUrl: 'views/eleccion.html',
+        controller: 'EleccionController'
+      })
+      .when('/cliente', {
         templateUrl: 'views/cliente.html',
         controller: 'ClienteController'
       })
-      .when('/:nro', {
+      .when('/cliente/:nro', {
         templateUrl: 'views/cliente.html',
         controller: 'ClienteController'
       })
-      /*.when('/caja', {
-        templateUrl: 'views/indexCaja.html',
+      .when('/caja', {
+        templateUrl: 'views/caja.html',
         controller: 'CajaController'
       })
       .when('/caja/:nro', {
-        templateUrl: 'views/indexCaja.html',
+        templateUrl: 'views/caja.html',
         controller: 'CajaController'
-      })*/
+      })
       .otherwise({
         redirectTo: '/'
       });

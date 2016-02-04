@@ -43,7 +43,7 @@
         <input type="text" class="form-control" id="idCliente">
       </div>
       <div class="col-md-4">
-        <button type="button" class="btn btn-lg btn-default" id="llamarCliente">Llamar otro cliente</button>
+        <button type="button" class="btn btn-lg btn-default" id="llamarOtroCliente">Llamar otro cliente</button>
       </div>
     </div>
   </div>
@@ -126,7 +126,7 @@
     $("#idCliente").val('');
   });
 
-  $("#llamarCliente").click(function() {
+  $("#llamarOtroCliente").click(function() {
     socket.emit('llamarOtroCliente')
   });
 

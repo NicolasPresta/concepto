@@ -1,0 +1,16 @@
+<div>
+  <div class="page-header">
+    <h1>Caja: {{socketID}} </h1>
+  </div>
+
+  <button ng-show="!estado.atendiendo" ng-click="abrirCaja()" type="submit" class="btn btn-lg">Abrir Caja</button>
+  <button ng-show="estado.atendiendo" ng-click="cerrarCaja()" type="submit" class="btn btn-lg">Cerrar Caja</button>
+  <button ng-show="estado.hayMasClientes" ng-click="llamarOtroCliente()" type="submit" class="btn btn-lg">Llamar otro cliente</button>
+
+  <div class="row" ng-repeat="cliente in estado.cola">
+	<button ng-click="atendiCliente(cliente.id)" type="submit" class="btn btn-lg">Atender a {{cliente.id}}</button>
+  </div>
+
+  <textarea ng-model="colaText" class="form-control"></textarea>
+  
+</div>

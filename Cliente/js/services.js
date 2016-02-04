@@ -17,4 +17,36 @@
       };
     }])
 
+    // Common
+    .factory('common', ['$rootScope', function($rootScope) {
+      return {
+
+        imprimir: function (data){
+          // Dado el objeto con toda la info de las colas, arma un resumen humanofriendly
+          var resumen = "----- COLA GENERAL ------ " + "\n" + "\n";
+
+          data.colaGeneral.forEach((cliente) => {
+            resumen = resumen + "-" + cliente.id + "\n";
+          });
+
+          resumen = resumen + "\n";
+
+          data.cajas.forEach((caja) => {
+            resumen = resumen + "----- CAJA " + caja.numero + " ------ Atendiendo: " +  caja.atendiendo  + "\n" + "\n";
+
+            caja.cola.forEach((cliente) => {
+              resumen = resumen + "-" + cliente.id + "\n";
+            });
+          });
+
+          return resumen;
+        },
+
+        getServerURL : function(){
+          return 'http://192.168.0.102:3001'
+        }
+
+      };
+    }])
+
 })();

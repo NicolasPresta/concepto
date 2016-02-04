@@ -1,13 +1,12 @@
-(function () {
-
+(function (_) {
   angular.module('fila.controllers', [])
-    .controller('ClienteController', ['$scope', '$routeParams', 'socket', function ($scope, $routeParams, socket) {
+    .controller('ClienteController', ['$scope', '$routeParams', 'socket', 'common', function ($scope, $routeParams, socket, common) {
     
       var nro = $routeParams.nro;
       // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
       // TODO: implementar la conexion de un cliente con un número dado.
 
-      socket.connect('http://localhost:3001');
+      socket.connect(common.getServerURL());
 
       $scope.hacerFila = function() {
         socket.emit('hacerFila');
@@ -20,7 +19,7 @@
       socket.on('nuevaCola', function(data) {
         $scope.$apply(function () {
           $scope.cola = data;
-          $scope.colaText = imprimir(data);
+          $scope.colaText = common.imprimir(data);
           $scope.estado = obtenerEstado(data, $scope.socketID);
         });
       });
@@ -31,6 +30,15 @@
         });
       });
 
+      socket.on('clienteAtendido', function() {
+        $scope.$apply(function () {
+          $scope.estado.atendido = true;
+          $scope.estado.estaEnFila = false;
+          $scope.estado.estaEnFilaGeneral = false;
+          $scope.estado.estaEnFilaCaja = false;
+        });
+      });
+
       function obtenerEstado(data, id)
       {
         var retorno = {
@@ -38,7 +46,8 @@
         estaEnFilaGeneral: false,
         estaEnFilaCaja: false,
         nroCaja: null,
-        genteDelante: null
+        genteDelante: null,
+        atendido: false
         }
 
         var ix = 0;
@@ -69,41 +78,75 @@
         return retorno;
       };
 
-      function imprimir(data)
-      {
-        // Dado el objeto con toda la info de las colas, arma un resumen humanofriendly
-        var resumen = "----- COLA GENERAL ------ " + "\n" + "\n";
+    }])
 
-        data.colaGeneral.forEach((cliente) => {
-          resumen = resumen + "-" + cliente.id + "\n";
+
+.controller('CajaController', ['$scope', '$routeParams', 'socket', 'common',  function ($scope, $routeParams, socket, common) {
+    
+      var nro = $routeParams.nro;
+      // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
+      // TODO: implementar la conexion de un cliente con un número dado.
+
+      socket.connect(common.getServerURL());
+
+      $scope.abrirCaja = function() {
+        socket.emit('abrirCaja');
+      };
+
+      $scope.cerrarCaja = function() {
+        socket.emit('cerrarCaja');
+      };
+
+      $scope.atendiCliente = function(id) {
+        socket.emit('atendiCliente', id);
+      };
+
+      $scope.llamarOtroCliente = function(id) {
+        socket.emit('llamarOtroCliente', id);
+      };
+
+
+      socket.on('nuevaCola', function(data) {
+        $scope.$apply(function () {
+          $scope.cola = data;
+          $scope.colaText = common.imprimir(data);
+          $scope.estado = obtenerEstado(data, $scope.socketID);
         });
+      });
 
-        resumen = resumen + "\n";
+      socket.on('tomaID', function(data) {
+        $scope.$apply(function () {
+          $scope.socketID = data;
+        });
+      });
+
+
+      function obtenerEstado(data, id)
+      {
+        var retorno = {
+          atendiendo: false,
+          hayMasClientes: false,
+          cola: null,
+        }
+
+        retorno.hayMasClientes = data.colaGeneral.length;
 
         data.cajas.forEach((caja) => {
-          resumen = resumen + "----- CAJA " + caja.numero + " ------ Atendiendo: " +  caja.atendiendo  + "\n" + "\n";
+          if(caja.numero == id){
+            retorno.cola = caja.cola;
+            retorno.atendiendo = caja.atendiendo;
+          }
+        })
 
-          caja.cola.forEach((cliente) => {
-            resumen = resumen + "-" + cliente.id + "\n";
-          });
-        });
-
-        return resumen;
+        return retorno;
       };
 
     }])
 
-
-    /*.controller('CajaController', ['$scope', '$routeParams', 'filaService', function ($scope, $routeParams, filaService) {
-      var nro = $routeParams.nro;
+    .controller('EleccionController', ['$scope', '$routeParams', 'socket', 'common',  function ($scope, $routeParams, socket, common) {
+    
      
-      // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
-      // TODO: implementar la conexion de un cliente con un número dado.
 
-      filaService.conectarCaja().then(function (data) {
-        $scope.cola = data
-      });
-
-    }])*/
+    }])
 
 })(_);
