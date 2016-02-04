@@ -4,9 +4,10 @@
 
     // Socket Service
     .factory('socket', ['$rootScope', function($rootScope) {
+      var socket;
       return {
-        connect: function(url) {
-          socket = io(url);
+        connect: function(url, params) {
+          socket = io(url, params);
         },
         on: function(eventName, callback){
           socket.on(eventName, callback);

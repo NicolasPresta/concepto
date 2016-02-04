@@ -8,6 +8,7 @@
     "babelify": "^7.2.0",
     "body-parser": "^1.14.2",
     "colors": "^1.1.2",
+    "device": "^0.3.3",
     "express": "^4.13.3",
     "ioredis": "^1.14.0",
     "jsonwebtoken": "^5.5.4",

@@ -2,15 +2,15 @@
  * Created by Artiom on 03/02/2016.
  */
 import jwt from "jsonwebtoken"
+import device from 'device'
+import appConfig from './config'
 
 var secureManager = {
 
 	getToken: function(token){
-		//var token = req.body.token || req.query.token || req.headers['x-access-token'];
-		// decode token
 		if (token) {
 			// verifies secret and checks exp
-			jwt.verify(token, APP_SECRET, function(err, decoded) {
+			jwt.verify(token, appConfig.app_secret, function(err, decoded) {
 				if (err) {
 					return {
 						success: false,
@@ -22,11 +22,8 @@ var secureManager = {
 						success: true,
 						data: decoded
 					};
-					//req.decoded = decoded;
-					//next();
 				}
 			});
-
 		} else {
 			return {
 				success: false,
@@ -35,8 +32,32 @@ var secureManager = {
 			};
 		}
 	},
-	handShake: function(idDispositivo){
-		return jwt.sign(idDispositivo, APP_SECRET, {expiresIn: '1 day'});
+	handShake: function(userAgent, idDispositivo){
+		//Verifica que el dispositivo sea un móvil...
+		let clientDevice = device(userAgent);
+		//Impostando el user-agent se podría evitar la validación
+		//Faltaría verificar uuid, o ver otro approach de seguridad
+		if (clientDevice.is('phone')){
+			return {
+				code: 200,
+				success: true,
+				token: jwt.sign(idDispositivo, appConfig.app_secret, {expiresIn: '1 day'})
+			}
+		} else {
+			return {
+				code: 403,
+				success: false,
+				message: 'No se ha podido validar el dispositivo'
+			}
+		}
+	},
+	//Para pruebas desde navegador
+	testHandshake: function(algunId){
+		return {
+			code: 200,
+			success: true,
+			token: jwt.sign(algunId, appConfig.app_secret)
+		}
 	}
 };
 
