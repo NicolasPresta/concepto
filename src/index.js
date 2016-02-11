@@ -29,18 +29,23 @@ const io = socketio(server);
 // Puntos de entrada REST
 router.post('/handshake', (req, res) => {
 	//TODO: verificar de algún modo la autenticidad del uuid
+	console.log(req.body);
 	let userAgent = req.headers['user-agent'];
 	let uuid = req.body.uuid;
 
+	console.log('nuevo handshake');
+	console.log(userAgent);
+	console.log(uuid);
 	let response = secureManager.handShake(userAgent, uuid);
-	res.status(response.code).send(response);
+	console.log(response);
+	res.status(response.code).json(response);
 });
 
 router.post('/testHandshake', (req, res) => {
 	console.log(req.body);
 	let miId = req.body.id;
 	let response = secureManager.testHandshake(miId);
-	res.status(response.code).send(response);
+	res.status(response.code).json(response);
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -70,8 +75,9 @@ io.set('authorization', socketJWT.authorize({
 
 app.use(express.static('Cliente'))
 
-io.sockets.on('connection', (socket) => {
+io.sockets.on('connect', (socket) => {
 	log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
+	console.log('nueva conexion socket');
 
 	// Uso el id del socket como identificador único, claramente eso no puede usarse en la realidad, ya que
 	// un cliente podria conectarse, desconectarse y volverse a conectar con otro socket.id, pero seguiria siendo el mismo cliente.

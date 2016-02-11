@@ -37,11 +37,15 @@ var secureManager = {
 		let clientDevice = device(userAgent);
 		//Impostando el user-agent se podría evitar la validación
 		//Faltaría verificar uuid, o ver otro approach de seguridad
-		if (clientDevice.is('phone')){
+		if (clientDevice.is('phone') || clientDevice.is('tablet')){
+			var payload = {
+				user: 'guest',
+				uuid: idDispositivo
+			};
 			return {
 				code: 200,
 				success: true,
-				token: jwt.sign(idDispositivo, appConfig.app_secret, {expiresIn: '1 day'})
+				token: jwt.sign(payload, appConfig.app_secret, {expiresIn: "1d"})
 			}
 		} else {
 			return {
