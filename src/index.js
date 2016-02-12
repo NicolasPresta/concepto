@@ -27,17 +27,21 @@ const io = socketio(server);
 
 
 // Puntos de entrada REST
+//Handshake para dispositivos
 router.post('/handshake', (req, res) => {
 	//TODO: verificar de algún modo la autenticidad del uuid
-	console.log(req.body);
 	let userAgent = req.headers['user-agent'];
 	let uuid = req.body.uuid;
 
-	console.log('nuevo handshake');
-	console.log(userAgent);
-	console.log(uuid);
 	let response = secureManager.handShake(userAgent, uuid);
-	console.log(response);
+	res.status(response.code).json(response);
+});
+
+router.post('/authCashbox', (req, res) => {
+	let idCaja = req.body.idCaja;
+	let pass = req.body.password;
+
+	let response = secureManager.authCashbox(idCaja, pass);
 	res.status(response.code).json(response);
 });
 
@@ -67,7 +71,11 @@ app.use(router);
  */
 
 // Conexiones por socket
-io.set('authorization', socketJWT.authorize({
+
+//Autorización con token
+//Luego de validar el token, su payload queda guardado en socket.decoded_token
+//Ahí tenemos la info del cliente y su id de dispositivo, por lo que usamos ese mismo payload para identificarlo
+io.use(socketJWT.authorize({
 	secret: appConfig.app_secret,
 	handshake: true
 }));
@@ -77,29 +85,39 @@ app.use(express.static('Cliente'))
 
 io.sockets.on('connect', (socket) => {
 	log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
-	console.log('nueva conexion socket');
+	console.log('Nueva conexión usuario ' + socket.decoded_token.user + ' - uuid: ' + socket.decoded_token.uuid);
 
-	// Uso el id del socket como identificador único, claramente eso no puede usarse en la realidad, ya que
-	// un cliente podria conectarse, desconectarse y volverse a conectar con otro socket.id, pero seguiria siendo el mismo cliente.
-	socket.emit('tomaID', socket.id);
+	//Primero envío info del estado del sistema
+	socket.emit('estadoSistema', colaManager.getObjetoColas());
+	//Luego chequeo que no sea un cliente que volvió después de haber estado offline
+	if (socket.decoded_token.user == 'cliente'){
+		if (colaManager.getClientePrioridad(socket.decoded_token.uuid)){
+			io.emit('actualizarFila', colaManager.getColaGeneral());
+		}
+	}
 
 	socket.on('disconnect', () =>{
 		log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`);
 
 		// Esto abria que controlarlo, pero para prototipar lo dejo asi:
-		colaManager.salirFila(socket.id);
-		colaManager.cerrarCaja(socket.id)
+		if (socket.decoded_token.user == 'cliente'){
+			colaManager.clienteDesconectado(socket.decoded_token);
+		} else {
+			//ver que se hace con las cajas
+		}
+		//colaManager.salirFila(socket.decoded_token);
+		//colaManager.cerrarCaja(socket.decoded_token);
 	});
 
-	socket.on('saludoGeneral', () => {
-		io.sockets.emit('saludo', socket.id)
-	});
+	socket.on('pedirActualizacion', () =>{
+		socket.emit('actualizarFila', colaManager.getColaGeneral());
+	})
 
 	socket.on('hacerFila', () => {
 		console.log('hacer fila');
-		colaManager.hacerFila(socket.id)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		colaManager.hacerFila(socket.decoded_token);
+		io.emit('actualizarFila', colaManager.getColaGeneral());
+		//socket.emit('haciendoFila', colaManager)
 		//cola.push(socket.id)
 		//socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
 
@@ -135,9 +153,10 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('salirFila', () => {
 
-		colaManager.salirFila(socket.id)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		console.log('alguien salió');
+		colaManager.salirFila(socket.decoded_token);
+		socket.broadcast.emit('actualizarFila', colaManager.getColaGeneral());
+		socket.emit('estadoSistema', colaManager.getObjetoColas());
 
 		// verificar si está haciendo la fila
 
@@ -156,8 +175,7 @@ io.sockets.on('connect', (socket) => {
 	socket.on('atendiCliente', (nroCliente) => {
 
 		colaManager.atendiCliente(socket.id, nroCliente)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		io.emit('actualizarFila', colaManager)
 		socket.to(nroCliente).emit('clienteAtendido');
 		// Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
 
@@ -172,8 +190,7 @@ io.sockets.on('connect', (socket) => {
 	socket.on('llamarOtroCliente', () => {
 
 		colaManager.llamarOtroCliente(socket.id)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		io.emit('actualizarFila', colaManager)
 
 		//cola.shift()
 		//socket.leave(ROOM_EN_FILA)

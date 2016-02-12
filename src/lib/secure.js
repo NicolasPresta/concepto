@@ -39,7 +39,7 @@ var secureManager = {
 		//Faltaría verificar uuid, o ver otro approach de seguridad
 		if (clientDevice.is('phone') || clientDevice.is('tablet')){
 			var payload = {
-				user: 'guest',
+				user: 'cliente',
 				uuid: idDispositivo
 			};
 			return {
@@ -54,6 +54,10 @@ var secureManager = {
 				message: 'No se ha podido validar el dispositivo'
 			}
 		}
+	},
+	//Las cajas van a funcionar desde la red interna del supermercado, por lo que no deberíamos preocuparnos demasiado por la seguridad
+	authCashbox: function(idCaja, clave){
+		//busco el id de la caja en la base y valido con la clave, si está ok, armo el payload con sus datos y le devuelvo el token
 	},
 	//Para pruebas desde navegador
 	testHandshake: function(algunId){
