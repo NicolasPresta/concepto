@@ -72,10 +72,14 @@ var secureManager = {
 	},
 	//Para pruebas desde navegador
 	testHandshake: function(algunId){
+		var payload = {
+			user: 'caja',
+			uuid: algunId
+		};
 		return {
 			code: 200,
 			success: true,
-			token: jwt.sign(algunId, appConfig.app_secret)
+			token: jwt.sign(payload, appConfig.app_secret)
 		}
 	}
 };
