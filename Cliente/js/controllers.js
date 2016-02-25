@@ -90,45 +90,52 @@
       }])
 
 
-      .controller('CajaController', ['$scope', '$routeParams', 'socket', 'common',  function ($scope, $routeParams, socket, common) {
+      .controller('CajaController', ['$scope', '$routeParams', 'socket', 'common', '$http', function ($scope, $routeParams, socket, common, $http) {
 
         var nro = $routeParams.nro;
         // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
         // TODO: implementar la conexion de un cliente con un número dado.
+        $http.post(common.getServerURL() + '/authCashbox', {idCaja: 1, password: "aloja"})
+            .then(function(data){
 
-        socket.connect(common.getServerURL());
+                socket.connect(common.getServerURL(), { query: 'token=' + data.data.token})
+            
+                //socket.connect(common.getServerURL());
 
-        $scope.abrirCaja = function() {
-          socket.emit('abrirCaja');
-        };
+                $scope.abrirCaja = function() {
+                  socket.emit('abrirCaja');
+                };
 
-        $scope.cerrarCaja = function() {
-          socket.emit('cerrarCaja');
-        };
+                $scope.cerrarCaja = function() {
+                  socket.emit('cerrarCaja');
+                };
 
-        $scope.atendiCliente = function(id) {
-          socket.emit('atendiCliente', id);
-        };
+                $scope.atendiCliente = function(id) {
+                  socket.emit('atendiCliente', id);
+                };
 
-        $scope.llamarOtroCliente = function(id) {
-          socket.emit('llamarOtroCliente', id);
-        };
+                $scope.llamarOtroCliente = function(id) {
+                  socket.emit('llamarOtroCliente', id);
+                };
 
 
-        socket.on('nuevaCola', function(data) {
-          $scope.$apply(function () {
-            $scope.cola = data;
-            $scope.colaText = common.imprimir(data);
-            $scope.estado = obtenerEstado(data, $scope.socketID);
-          });
+                socket.on('nuevaCola', function(data) {
+                  $scope.$apply(function () {
+                    $scope.cola = data;
+                    $scope.colaText = common.imprimir(data);
+                    $scope.estado = obtenerEstado(data, $scope.socketID);
+                  });
+                });
+
+                socket.on('tomaID', function(data) {
+                  $scope.$apply(function () {
+                    $scope.socketID = data;
+                  });
+                });
+
+          }, function(err){
+              console.log('error de autenticacion')
         });
-
-        socket.on('tomaID', function(data) {
-          $scope.$apply(function () {
-            $scope.socketID = data;
-          });
-        });
-
 
         function obtenerEstado(data, id)
         {

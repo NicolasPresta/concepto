@@ -3,8 +3,6 @@ import http from 'http'
 import express from 'express'
 import bodyParser from "body-parser"
 import methodOverride from "method-override"
-//import semaforo from 'semaphore'
-//import Redis from 'ioredis'
 import socketio from 'socket.io'
 import jwt from "jsonwebtoken"
 import socketJWT from "socketio-jwt"
@@ -12,8 +10,8 @@ import socketJWT from "socketio-jwt"
 import colaManager from './lib/cola.js'
 import secureManager from './lib/secure'
 import log from './lib/console-log.js'
-
 import appConfig from './lib/config'
+
 
 // Definicion de constantes
 const app = express();
@@ -21,8 +19,6 @@ const server = http.createServer(app);
 //const port = process.env.PORT || 3000
 const port = process.argv[2] || 3001;
 const router = express.Router();
-//const sem = semaforo(1)
-//const redis = new Redis()
 const io = socketio(server);
 
 
@@ -38,6 +34,8 @@ router.post('/handshake', (req, res) => {
 });
 
 router.post('/authCashbox', (req, res) => {
+	console.log(req.body);
+
 	let idCaja = req.body.idCaja;
 	let pass = req.body.password;
 
@@ -52,23 +50,12 @@ router.post('/testHandshake', (req, res) => {
 	res.status(response.code).json(response);
 });
 
+// Middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(router);
-/*
- app.use('/secure', (req, res, next) => {
- //Definir en donde va a llegar el token
- var token = req.body.token || req.query.token || req.headers['x-access-token'];
- var checkResponse = secureManager.getToken(token);
- if (checkResponse.success){
- req.decoded = checkResponse.data;
- next();
- } else {
- res.send(checkResponse.code)(checkResponse);
- }
- });
- */
+
 
 // Conexiones por socket
 
@@ -80,15 +67,16 @@ io.use(socketJWT.authorize({
 	handshake: true
 }));
 
-
 app.use(express.static('Cliente'))
+
 
 io.sockets.on('connect', (socket) => {
 	log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
 	console.log('Nueva conexión usuario ' + socket.decoded_token.user + ' - uuid: ' + socket.decoded_token.uuid);
 
 	//Primero envío info del estado del sistema
-	socket.emit('estadoSistema', colaManager.getObjetoColas());
+	socket.emit('estadoSistema', colaManager);
+
 	//Luego chequeo que no sea un cliente que volvió después de haber estado offline
 	if (socket.decoded_token.user == 'cliente'){
 		if (colaManager.getClientePrioridad(socket.decoded_token.uuid)){
@@ -96,6 +84,7 @@ io.sockets.on('connect', (socket) => {
 		}
 	}
 
+	// TODO: Analisar cuando se emite este evento.
 	socket.on('disconnect', () =>{
 		log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`);
 
@@ -109,29 +98,26 @@ io.sockets.on('connect', (socket) => {
 		//colaManager.cerrarCaja(socket.decoded_token);
 	});
 
+	// El cliente usa este metodo para conocer la fila actual, se usa en caso de que se haya desconectado.
 	socket.on('pedirActualizacion', () =>{
 		socket.emit('actualizarFila', colaManager.getColaGeneral());
 	})
 
 	socket.on('hacerFila', () => {
 		console.log('hacer fila');
+
+		// Agregar en la fila
 		colaManager.hacerFila(socket.decoded_token);
-		io.emit('actualizarFila', colaManager.getColaGeneral());
-		//socket.emit('haciendoFila', colaManager)
-		//cola.push(socket.id)
-		//socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
-
-		// verificar que no esté haciendo ya la fila
-
-		// agregar al final de la fila
-
-		// rearmar fila
 
 		// notificar a todos los integrantes de la fila y a las cajas
+		io.emit('actualizarFila', colaManager.getColaGeneral());
+
+		// Grabar en REDIS la nueva cola
+
 
 		// grabar en base de datos el evento
 
-		// Grabar en REDIS la nueva cola
+
 
 	});
 
@@ -208,9 +194,9 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('abrirCaja', () => {
 
-		colaManager.abrirCaja(socket.id)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		log.info("Abrir CAJA -" + socket.decoded_token.uuid)
+		colaManager.abrirCaja(socket.decoded_token.uuid)
+		io.emit('nuevaCola', colaManager)
 
 		// Generar un ID único para la caja
 
@@ -230,8 +216,7 @@ io.sockets.on('connect', (socket) => {
 	socket.on('cerrarCaja', () => {
 
 		colaManager.cerrarCaja(socket.id)
-		socket.broadcast.emit('nuevaCola', colaManager)
-		socket.emit('nuevaCola', colaManager)
+		io.emit('nuevaCola', colaManager)
 
 		// Quitar la caja al sistema
 

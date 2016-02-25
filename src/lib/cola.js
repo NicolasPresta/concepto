@@ -3,10 +3,10 @@
 const MAXIMO_POR_CAJA = 2;
 const RETRASO_MINIMO = 2;
 
-import Redis from 'ioredis';
+//import Redis from 'ioredis';
 import appConfig from './config';
 
-const redisClient = new Redis(appConfig.redis_port, appConfig.redis_host);
+//const redisClient = new Redis(appConfig.redis_port, appConfig.redis_host);
 
 // Clase CAJA
 function Caja(nro){
@@ -43,7 +43,7 @@ function Cliente(dataCliente){
 	this.retrasoPersonas = RETRASO_MINIMO;
 	this.conectado = true;
 
-	redisClient.multi().set('client:' + dataCliente.uuid, JSON.stringify(this)).sadd('clients', dataCliente.uuid);
+	//redisClient.multi().set('client:' + dataCliente.uuid, JSON.stringify(this)).sadd('clients', dataCliente.uuid);
 }
 
 
@@ -138,7 +138,7 @@ var colaManager = {
 			return "WTF";
 
 		// sacamos un cliente de la cola general
-		redisClient.lpop('generalqueue');
+		//redisClient.lpop('generalqueue');
 		var cliente = this.colaGeneral.shift();
 
 		// Si hay algun cliente 
@@ -194,7 +194,7 @@ var colaManager = {
 		// Agrego al cliente a la cola general
 		var nuevoCliente = new Cliente(dataCliente);
 
-		redisClient.rpush('generalqueue', nuevoCliente.id);
+		//redisClient.rpush('generalqueue', nuevoCliente.id);
 		this.colaGeneral.push(nuevoCliente);
 
 		var cajasQuePuedenAtender = []

@@ -35,6 +35,7 @@ var secureManager = {
 	handShake: function(userAgent, idDispositivo){
 		//Verifica que el dispositivo sea un móvil...
 		let clientDevice = device(userAgent);
+
 		//Impostando el user-agent se podría evitar la validación
 		//Faltaría verificar uuid, o ver otro approach de seguridad
 		if (clientDevice.is('phone') || clientDevice.is('tablet')){
@@ -58,6 +59,16 @@ var secureManager = {
 	//Las cajas van a funcionar desde la red interna del supermercado, por lo que no deberíamos preocuparnos demasiado por la seguridad
 	authCashbox: function(idCaja, clave){
 		//busco el id de la caja en la base y valido con la clave, si está ok, armo el payload con sus datos y le devuelvo el token
+		var payload = {
+				user: 'caja',
+				uuid: idCaja
+			};
+		return {
+				code: 200,
+				success: true,
+				token: jwt.sign(payload, appConfig.app_secret, {expiresIn: "1d"})
+			}
+
 	},
 	//Para pruebas desde navegador
 	testHandshake: function(algunId){
