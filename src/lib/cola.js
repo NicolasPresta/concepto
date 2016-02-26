@@ -54,6 +54,7 @@ var colaManager = {
 	colaGeneral: [],
 	//Para clientes que se desconecten
 	colaOffline: [],
+	tiempoPromedioAtencion: 5,
 
 	getCaja: function(nroCaja){
 		return this.cajas.find((caja) => {

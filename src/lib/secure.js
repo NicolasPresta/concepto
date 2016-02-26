@@ -73,7 +73,7 @@ var secureManager = {
 	//Para pruebas desde navegador
 	testHandshake: function(algunId){
 		var payload = {
-			user: 'caja',
+			user: 'cliente',
 			uuid: algunId
 		};
 		return {

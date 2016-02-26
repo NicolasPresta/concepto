@@ -74,15 +74,12 @@ io.sockets.on('connect', (socket) => {
 	log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port})`);
 	console.log('Nueva conexión usuario ' + socket.decoded_token.user + ' - uuid: ' + socket.decoded_token.uuid);
 
-	//Primero envío info del estado del sistema
-	socket.emit('estadoSistema', colaManager);
-
 	//Luego chequeo que no sea un cliente que volvió después de haber estado offline
 	if (socket.decoded_token.user == 'cliente'){
-		if (colaManager.getClientePrioridad(socket.decoded_token.uuid)){
-			io.emit('actualizarFila', colaManager.getColaGeneral());
-		}
+		colaManager.getClientePrioridad(socket.decoded_token.uuid);
 	}
+
+	io.emit('actualizarFila', colaManager);
 
 	// TODO: Analisar cuando se emite este evento.
 	socket.on('disconnect', () =>{
@@ -100,7 +97,7 @@ io.sockets.on('connect', (socket) => {
 
 	// El cliente usa este metodo para conocer la fila actual, se usa en caso de que se haya desconectado.
 	socket.on('pedirActualizacion', () =>{
-		socket.emit('actualizarFila', colaManager.getColaGeneral());
+		socket.emit('actualizarFila', colaManager);
 	})
 
 	socket.on('hacerFila', () => {
@@ -110,7 +107,7 @@ io.sockets.on('connect', (socket) => {
 		colaManager.hacerFila(socket.decoded_token);
 
 		// notificar a todos los integrantes de la fila y a las cajas
-		io.emit('actualizarFila', colaManager.getColaGeneral());
+		io.emit('actualizarFila', colaManager);
 
 		// Grabar en REDIS la nueva cola
 
@@ -141,8 +138,8 @@ io.sockets.on('connect', (socket) => {
 
 		console.log('alguien salió');
 		colaManager.salirFila(socket.decoded_token);
-		socket.broadcast.emit('actualizarFila', colaManager.getColaGeneral());
-		socket.emit('estadoSistema', colaManager.getObjetoColas());
+		io.emit('actualizarFila', colaManager);
+		//socket.emit('estadoSistema', colaManager);
 
 		// verificar si está haciendo la fila
 
@@ -160,7 +157,7 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('atendiCliente', (nroCliente) => {
 
-		colaManager.atendiCliente(socket.id, nroCliente)
+		colaManager.atendiCliente(socket.decoded_token.uuid, nroCliente)
 		io.emit('actualizarFila', colaManager)
 		socket.to(nroCliente).emit('clienteAtendido');
 		// Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
@@ -175,7 +172,7 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('llamarOtroCliente', () => {
 
-		colaManager.llamarOtroCliente(socket.id)
+		colaManager.llamarOtroCliente(socket.decoded_token.uuid)
 		io.emit('actualizarFila', colaManager)
 
 		//cola.shift()
@@ -196,7 +193,7 @@ io.sockets.on('connect', (socket) => {
 
 		log.info("Abrir CAJA -" + socket.decoded_token.uuid)
 		colaManager.abrirCaja(socket.decoded_token.uuid)
-		io.emit('nuevaCola', colaManager)
+		io.emit('actualizarFila', colaManager)
 
 		// Generar un ID único para la caja
 
@@ -215,8 +212,8 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('cerrarCaja', () => {
 
-		colaManager.cerrarCaja(socket.id)
-		io.emit('nuevaCola', colaManager)
+		colaManager.cerrarCaja(socket.decoded_token.uuid)
+		io.emit('actualizarFila', colaManager)
 
 		// Quitar la caja al sistema
 

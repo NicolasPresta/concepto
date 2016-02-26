@@ -12,41 +12,45 @@
 
         $http.post(common.getServerURL() + '/testHandshake', miId)
             .then(function(data){
-              socket.connect(common.getServerURL(), { query: 'token=' + data.token})
+              socket.connect(common.getServerURL(), { query: 'token=' + data.data.token});
+
+                $scope.hacerFila = function() {
+                    socket.emit('hacerFila');
+                };
+
+                $scope.salirFila = function() {
+                    socket.emit('salirFila');
+                };
+
+                socket.on('actualizarFila', function(data) {
+                    $scope.$apply(function () {
+                        $scope.cola = data;
+                        $scope.colaText = common.imprimir(data);
+                        $scope.estado = obtenerEstado(data, $scope.socketID);
+                    });
+                });
+
+                socket.on('estadoSistema', function(data) {
+                    $scope.$apply(function () {
+                        $scope.socketID = 1;
+                    });
+                });
+
+                socket.on('clienteAtendido', function() {
+                    $scope.$apply(function () {
+                        $scope.estado.atendido = true;
+                        $scope.estado.estaEnFila = false;
+                        $scope.estado.estaEnFilaGeneral = false;
+                        $scope.estado.estaEnFilaCaja = false;
+                    });
+                });
+
+
             }, function(err){
               console.log('error de autenticacion')
             });
 
-        $scope.hacerFila = function() {
-          socket.emit('hacerFila');
-        };
 
-        $scope.salirFila = function() {
-          socket.emit('salirFila');
-        };
-
-        socket.on('nuevaCola', function(data) {
-          $scope.$apply(function () {
-            $scope.cola = data;
-            $scope.colaText = common.imprimir(data);
-            $scope.estado = obtenerEstado(data, $scope.socketID);
-          });
-        });
-
-        socket.on('tomaID', function(data) {
-          $scope.$apply(function () {
-            $scope.socketID = data;
-          });
-        });
-
-        socket.on('clienteAtendido', function() {
-          $scope.$apply(function () {
-            $scope.estado.atendido = true;
-            $scope.estado.estaEnFila = false;
-            $scope.estado.estaEnFilaGeneral = false;
-            $scope.estado.estaEnFilaCaja = false;
-          });
-        });
 
         function obtenerEstado(data, id)
         {
@@ -98,8 +102,9 @@
         $http.post(common.getServerURL() + '/authCashbox', {idCaja: 1, password: "aloja"})
             .then(function(data){
 
+                $scope.socketID = 1;
                 socket.connect(common.getServerURL(), { query: 'token=' + data.data.token})
-            
+
                 //socket.connect(common.getServerURL());
 
                 $scope.abrirCaja = function() {
@@ -118,8 +123,7 @@
                   socket.emit('llamarOtroCliente', id);
                 };
 
-
-                socket.on('nuevaCola', function(data) {
+                socket.on('actualizarFila', function(data) {
                   $scope.$apply(function () {
                     $scope.cola = data;
                     $scope.colaText = common.imprimir(data);
@@ -127,11 +131,6 @@
                   });
                 });
 
-                socket.on('tomaID', function(data) {
-                  $scope.$apply(function () {
-                    $scope.socketID = data;
-                  });
-                });
 
           }, function(err){
               console.log('error de autenticacion')
