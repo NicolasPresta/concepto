@@ -153,6 +153,8 @@ io.sockets.on('connect', (socket) => {
 
 		// Grabar en REDIS la nueva cola
 
+		//hola
+
 	});
 
 	socket.on('atendiCliente', (nroCliente) => {
