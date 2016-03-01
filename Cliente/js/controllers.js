@@ -2,15 +2,10 @@
   angular.module('fila.controllers', [])
       .controller('ClienteController', ['$scope', '$routeParams', 'socket', 'common', '$http', function ($scope, $routeParams, socket, common, $http) {
 
-        var nro = $routeParams.nro;
-        // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
-        // TODO: implementar la conexion de un cliente con un número dado.
+        // Como esto es un explorador web y no hay uuid, tenemos que "simularlo"
+        $scope.uuid = Math.floor((Math.random() * 1000) + 1);
 
-        var miId = {
-          id:1
-        };
-
-        $http.post(common.getServerURL() + '/testHandshake', miId)
+        $http.post(common.getServerURL() + '/testHandshake', {uuid: $scope.uuid} )
             .then(function(data){
               socket.connect(common.getServerURL(), { query: 'token=' + data.data.token});
 
@@ -22,17 +17,13 @@
                     socket.emit('salirFila');
                 };
 
+                // TODO: Retrasarme
+
                 socket.on('actualizarFila', function(data) {
                     $scope.$apply(function () {
                         $scope.cola = data;
                         $scope.colaText = common.imprimir(data);
-                        $scope.estado = obtenerEstado(data, $scope.socketID);
-                    });
-                });
-
-                socket.on('estadoSistema', function(data) {
-                    $scope.$apply(function () {
-                        $scope.socketID = 1;
+                        $scope.estado = obtenerEstado(data, $scope.uuid);
                     });
                 });
 
@@ -96,14 +87,13 @@
 
       .controller('CajaController', ['$scope', '$routeParams', 'socket', 'common', '$http', function ($scope, $routeParams, socket, common, $http) {
 
-        var nro = $routeParams.nro;
-        // nro puede ser nulo, en cuyo caso se trata de la conexion de un cliente nuevo
-        // TODO: implementar la conexion de un cliente con un número dado.
-        $http.post(common.getServerURL() + '/authCashbox', {idCaja: 1, password: "aloja"})
+        $scope.uuid = Math.floor((Math.random() * 1000) + 1);
+
+        $http.post(common.getServerURL() + '/authCashbox', {idCaja: $scope.uuid, password: "passfalsa123"})
             .then(function(data){
 
-                $scope.socketID = 1;
-                socket.connect(common.getServerURL(), { query: 'token=' + data.data.token})
+                
+                socket.connect(common.getServerURL(), { query: 'token=' + data.data.token});
 
                 //socket.connect(common.getServerURL());
 
@@ -127,7 +117,7 @@
                   $scope.$apply(function () {
                     $scope.cola = data;
                     $scope.colaText = common.imprimir(data);
-                    $scope.estado = obtenerEstado(data, $scope.socketID);
+                    $scope.estado = obtenerEstado(data, $scope.uuid);
                   });
                 });
 

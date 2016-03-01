@@ -38,8 +38,8 @@ function Caja(nro){
 
 
 // Clase CLIENTE
-function Cliente(dataCliente){
-	this.id = dataCliente.uuid;
+function Cliente(idCliente){
+	this.id = idCliente;
 	this.retrasoPersonas = RETRASO_MINIMO;
 	this.conectado = true;
 
@@ -190,10 +190,10 @@ var colaManager = {
 		this.llamarCliente(caja)
 	},
 
-	hacerFila: function(dataCliente){
+	hacerFila: function(idCliente){
 
 		// Agrego al cliente a la cola general
-		var nuevoCliente = new Cliente(dataCliente);
+		var nuevoCliente = new Cliente(idCliente);
 
 		//redisClient.rpush('generalqueue', nuevoCliente.id);
 		this.colaGeneral.push(nuevoCliente);
@@ -251,10 +251,10 @@ var colaManager = {
 		}
 	},
 
-	clienteDesconectado: function(dataCliente){
+	clienteDesconectado: function(idCliente){
 
 		//Me fijo si el cliente estaba en la cola general
-		var cliente = this.getCliente(dataCliente.uuid);
+		var cliente = this.getCliente(idCliente);
 
 		if (cliente){
 			cliente.conectado = false;

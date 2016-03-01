@@ -44,7 +44,7 @@
         },
 
         getServerURL : function(){
-          return 'http://192.168.0.100:3001'
+          return 'http://localhost:3001'
         }
 
       };

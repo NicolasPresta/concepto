@@ -5,8 +5,9 @@
 
 import Log from 'log'
 import colors from 'colors'
+import appConfig from './config'
 
-const log = new Log('info');
+const log = new Log(appConfig.LogLevel);
 
 colors.setTheme({
   debug: 'bgCyan',
@@ -23,35 +24,35 @@ colors.setTheme({
 var colorLoger = {
 
 	debug: function(msj){
-		log.debug(msj.debug)
+		log.debug(msj)
 	},
 
 	info: function(msj){
-		log.info(msj.info)
+		log.info(msj)
 	},
 
 	notice: function(msj){
-		log.notice(msj.notice)
+		log.notice(msj)
 	},
 
 	warning: function(msj){
-		log.warning(msj.warning)
+		log.warning(msj)
 	},
 
 	error: function(msj){
-		log.error(msj.error)
+		log.error(msj)
 	},
 
 	critical: function(msj){
-		log.critical(msj.critical)
+		log.critical(msj)
 	},
 
 	alert: function(msj){
-		log.alert(msj.alert)
+		log.alert(msj)
 	},
 
 	emergency: function(msj){
-		log.emergency(msj.emergency)
+		log.emergency(msj)
 	}
 }
 
