@@ -143,23 +143,18 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('salirFila', () => {
 
-		console.log('alguien salió');
-		colaManager.salirFila(socket.decoded_token);
-		io.emit('actualizarFila', colaManager);
-
-		// verificar si está haciendo la fila
-
-		// sacar de la fila
-
-		// rearmar fila
+		log.debug('alguien salió');
+		
+		// verificar si está haciendo la fila, sacar de la fila, rearmar fila
+		colaManager.salirFila(socket.decoded_token.uuid);
 
 		// notificar a todos los integrantes de la fila y a las cajas
+		io.emit('actualizarFila', colaManager);
 
 		// grabar en base de datos el evento
 
 		// Grabar en REDIS la nueva cola
 
-		//hola
 	});
 
 
