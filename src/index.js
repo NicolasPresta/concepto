@@ -54,9 +54,9 @@ router.post('/testHandshake', (req, res) => {
 });
 
 // Middlewares
-app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.urlencoded({ extended: false })); // Analisar si se usa o si se puede sacar
 app.use(bodyParser.json());
-app.use(methodOverride());
+//app.use(methodOverride()); // Analisar si se usa o si se puede sacar
 app.use(router);
 
 
@@ -122,7 +122,6 @@ io.sockets.on('connect', (socket) => {
 
 		// Grabar en REDIS la nueva cola
 
-
 		// grabar en base de datos el evento
 	});
 
@@ -144,7 +143,6 @@ io.sockets.on('connect', (socket) => {
 
 
 	socket.on('salirFila', () => {
-
 		log.debug('alguien salió');
 		
 		// verificar si está haciendo la fila, sacar de la fila, rearmar fila
@@ -181,16 +179,11 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('llamarOtroCliente', () => {
 
-		colaManager.llamarOtroCliente(socket.decoded_token.uuid)
-		io.emit('actualizarFila', colaManager)
-
-		//cola.shift()
-		//socket.leave(ROOM_EN_FILA)
-		//socket.broadcast.to(ROOM_EN_FILA).emit('nuevaCola', cola)
-
 		// Sacar a un cliente de la fila generar y pasarlo a la fila de la caja
+		colaManager.llamarOtroCliente(socket.decoded_token.uuid)
 
 		// notificar a todos los integrantes de la fila y a las cajas
+		io.emit('actualizarFila', colaManager)
 
 		// grabar en base de datos el evento
 
@@ -201,18 +194,12 @@ io.sockets.on('connect', (socket) => {
 	socket.on('abrirCaja', () => {
 
 		log.info("Abrir CAJA -" + socket.decoded_token.uuid)
+		
+		// Agregar la caja al sistema, Rearmar las colas
 		colaManager.abrirCaja(socket.decoded_token.uuid)
-		io.emit('actualizarFila', colaManager)
-
-		// Generar un ID único para la caja
-
-		// Devolverle el ID
-
-		// Agregar la caja al sistema
-
-		// Rearmar las colas
 
 		// notificar a todos los integrantes de la fila y a las cajas
+		io.emit('actualizarFila', colaManager)
 
 		// grabar en base de datos el evento
 
@@ -222,15 +209,13 @@ io.sockets.on('connect', (socket) => {
 
 	socket.on('cerrarCaja', () => {
 
+		// Cerrar la caja en al sistema, Rearmar las colas
 		colaManager.cerrarCaja(socket.decoded_token.uuid)
-		io.emit('actualizarFila', colaManager)
-
-		// Quitar la caja al sistema
-
-		// Rearmar las colas
 
 		// notificar a todos los integrantes de la fila y a las cajas
+		io.emit('actualizarFila', colaManager)
 
+		
 		// grabar en base de datos el evento
 
 		// Grabar en REDIS la nueva cola
