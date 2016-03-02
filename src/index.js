@@ -24,7 +24,10 @@ const io = socketio(server);
 //app.use(bodyParser.urlencoded({ extended: false })); // Analisar si se usa o si se puede sacar
 app.use(bodyParser.json());
 //app.use(methodOverride()); // Analisar si se usa o si se puede sacar
+
+// Puntos de entrada REST
 app.use(router);
+
 // Permite servir los archivos estaticos de la carpeta /Cliente (necesario para levantar los clientes y cajas dummys)
 app.use(express.static('Cliente'))
 
