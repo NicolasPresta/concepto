@@ -1,9 +1,10 @@
 // TODO: retrasarme, calcular tiempos de espera, etc
 
+import log from './console-log.js'
+import appConfig from './config';
+
 const MAXIMO_POR_CAJA = 2;
 const RETRASO_MINIMO = 2;
-
-import appConfig from './config';
 
 // Clase CAJA
 function Caja(nro){
@@ -29,7 +30,7 @@ function Caja(nro){
     		 this.cola.splice(index, 1)
 		}
 		else
-			return "WTF"
+			log.error("esto no debería pasar en: sacarCliente")
 	}
 }
 
@@ -45,11 +46,14 @@ function Cliente(idCliente){
 // Manager de COLAS
 var colaManager = {
 
+	tiempoPromedioAtencion: 5, // TODO: calculo de este abributo
+
 	cajas: [],
 	colaGeneral: [],
-	//Para clientes que se desconecten
+
+	//Para clientes que se desconecten (TODO: Pensar que esta cola podria quedar con conexiones muy viejas, depurar?)
 	colaOffline: [],
-	tiempoPromedioAtencion: 5,
+
 
 	getCaja: function(nroCaja){
 		return this.cajas.find((caja) => {
@@ -63,16 +67,17 @@ var colaManager = {
 		});
 	},
 
-	getClientePrioridad: function(idCliente){
+	// verifica si el cliente estaba en la cola de alta prioridad de clientes deconectados.
+	// Si estaba entonces lo pone al comienzo de la cola general
+	verificarReconexion: function(idCliente){
+
 		var clienteProdigo = this.colaOffline.find((cliente) => {
 			return cliente.id == idCliente;
 		});
+
 		if (clienteProdigo){
 			this.colaGeneral.unshift(clienteProdigo);
 			this.colaOffline.splice(this.colaOffline.indexOf(clienteProdigo), 1);
-			return true;
-		} else {
-			return false;
 		}
 	},
 
@@ -84,7 +89,7 @@ var colaManager = {
     		 this.colaGeneral.splice(index, 1)
 		}
 		else
-			return "WTF"
+			log.error("esto no debería pasar en: sacarCliente")
 	},
 
 	agregarCaja: function(nroCaja){
@@ -123,7 +128,7 @@ var colaManager = {
 		var caja = this.getCaja(nroCaja);
 
 		if(!caja)
-			return "WTF";
+			log.error("esto no debería pasar en: cerrarCaja")
 
 		caja.atendiendo = false
 	},
@@ -131,7 +136,7 @@ var colaManager = {
 	llamarCliente: function(caja){
 
 		if(!caja.atendiendo)
-			return "WTF";
+			log.error("esto no debería pasar en: llamarCliente")
 
 		// sacamos un cliente de la cola general
 		//redisClient.lpop('generalqueue');
@@ -147,8 +152,9 @@ var colaManager = {
 				// Y le asignamos el número de la caja a la cual tiene que ir
 				cliente.caja = caja.numero
 			} else {
-
+				// Si no está conectado queda en una cola especial con alta prioridad
 				this.colaOffline.push(cliente);
+				// Y se llama a otro cliente
 				this.llamarCliente(caja);
 			}
 
@@ -159,7 +165,7 @@ var colaManager = {
 	 	var caja = this.getCaja(idCaja)
 
 	 	if(!caja)
-	 		return "WTF"
+	 		log.error("esto no debería pasar en: llamarOtroCliente")
 
 	 	this.llamarCliente(caja)
 	},
@@ -170,13 +176,13 @@ var colaManager = {
 		var caja = this.getCaja(nroCaja);
 
 		if (!caja)
-			return "WTF";
+			log.error("esto no debería pasar 1 en: atendiCliente")
 
 		// Buscamos la cliente dentro de la cola de esa caja
 		var cliente = caja.getCliente(idCliente);
 		
 		if (!cliente)
-			return "WTF2";
+			log.error("esto no debería pasar 2 en: atendiCliente")
 
 		// Sacamos al cliente de la caja
 		caja.sacarCliente(cliente);
@@ -213,9 +219,9 @@ var colaManager = {
 		})
 
 		if (!cajaElegida)
-			return "WTF"
-
-		this.llamarCliente(cajaElegida)
+			log.error("alguien está queriendo hacer la fila antes de que haya una caja habilitada")
+		else
+			this.llamarCliente(cajaElegida)
 	},
 
 	salirFila: function(idCliente){
@@ -341,7 +347,6 @@ var colaManager = {
 		//this.colaGeneral = [1,2,3,4,6];
 		return {colaGeneral: [1,2,3,4,5,6], cajas: [{numero: 4, cola: []}, {numero: 5, cola: []}]}
 	}
-
 }
 
 

@@ -79,34 +79,36 @@ io.sockets.on('connect', (socket) => {
 
 	log.info(`Socket: Nueva conexión ${socket.id} (en puerto ${port}),  Usuario: ${socket.decoded_token.user},  uuid:  ${socket.decoded_token.uuid}`);
 
-	//Luego chequeo que no sea un cliente que volvió después de haber estado offline
+	// Primero: Chequeo que no sea un cliente que volvió después de haber estado offline
 	if (socket.decoded_token.user == 'cliente'){
-		colaManager.getClientePrioridad(socket.decoded_token.uuid);
+		colaManager.verificarReconexion(socket.decoded_token.uuid);
 	}
 
-	// Emito este evento, pues si el cliente es uno que volvio de estar offline, la cola sufrió modificaciones
+	// Luego: Emito este evento, pues si el cliente es uno que volvio de estar offline, la cola sufrió modificaciones
 	io.emit('actualizarFila', colaManager);
 
-
-	// TODO: Analisar cuando se emite este evento.
+	// TODO: Analisar CUANDO y PQ se emite este evento "disconnect"
 	socket.on('disconnect', () =>{
 		log.info(`Socket: Se desconectó ${socket.id} (en puerto ${port})`);
 
-		// Esto abria que controlarlo, pero para prototipar lo dejo asi:
 		if (socket.decoded_token.user == 'cliente'){
+			// Si el que se desconecta es un cliente, lo marcamos como desconectado
 			colaManager.clienteDesconectado(socket.decoded_token.uuid);
 		} else {
-			//ver que se hace con las cajas
+			//ver que se hace con las cajas en caso de desconexión
+			//NMR: 	Se me ocurre que se puede cerrar la caja y listo. De esta forma nadie más va a ser llamado a esa caja.
+			// 		Si luego la caja vuelve a conectarse se va a marcar como abierta nuevamente y todos felices.
+			colaManager.cerrarCaja(socket.decoded_token.uuid)
+			io.emit('actualizarFila', colaManager)
 		}
-		//colaManager.salirFila(socket.decoded_token);
-		//colaManager.cerrarCaja(socket.decoded_token);
+
 	});
 
 
 	// El cliente usa este metodo para conocer la fila actual, se usa en caso de que se haya desconectado.
 	socket.on('pedirActualizacion', () =>{
 		socket.emit('actualizarFila', colaManager);
-	})
+	});
 
 
 	socket.on('hacerFila', () => {
