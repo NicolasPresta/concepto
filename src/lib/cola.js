@@ -192,36 +192,40 @@ var colaManager = {
 	},
 
 	hacerFila: function(idCliente){
-
 		// Agrego al cliente a la cola general
-		var nuevoCliente = new Cliente(idCliente);
+		var nuevoCliente = this.getCliente(idCliente);
 
-		//redisClient.rpush('generalqueue', nuevoCliente.id);
-		this.colaGeneral.push(nuevoCliente);
+		//Chequeo que el cliente no esté haciendo la fila, si no está lo creo y lo agrego
+		if (nuevoCliente === undefined){
+			nuevoCliente = new Cliente(idCliente);
 
-		var cajasQuePuedenAtender = []
+			//redisClient.rpush('generalqueue', nuevoCliente.id);
+			this.colaGeneral.push(nuevoCliente);
 
-		// Me fijo si alguna caja está en condiciones de atender a un cliente nuevo
-		this.cajas.forEach((caja) => {
-			if(caja.puedeAtenderNuevoCliente())
-				cajasQuePuedenAtender.push(caja)
-		})
+			var cajasQuePuedenAtender = []
 
-		// De entre todas las cajas que pueden atender, tomo la que menos clientes tenga en su cola
-		var cajaElegida
+			// Me fijo si alguna caja está en condiciones de atender a un cliente nuevo
+			this.cajas.forEach((caja) => {
+				if(caja.puedeAtenderNuevoCliente())
+					cajasQuePuedenAtender.push(caja)
+			})
 
-		if (cajasQuePuedenAtender.length > 0)
-			cajaElegida = cajasQuePuedenAtender[0]
+			// De entre todas las cajas que pueden atender, tomo la que menos clientes tenga en su cola
+			var cajaElegida
 
-		cajasQuePuedenAtender.forEach((caja) =>{
-			if(cajaElegida.cola.length > caja.cola.length)
-				cajaElegida = caja
-		})
+			if (cajasQuePuedenAtender.length > 0)
+				cajaElegida = cajasQuePuedenAtender[0]
 
-		if (!cajaElegida)
-			log.error("alguien está queriendo hacer la fila antes de que haya una caja habilitada")
-		else
-			this.llamarCliente(cajaElegida)
+			cajasQuePuedenAtender.forEach((caja) =>{
+				if(cajaElegida.cola.length > caja.cola.length)
+					cajaElegida = caja
+			})
+
+			if (!cajaElegida)
+				log.error("alguien está queriendo hacer la fila antes de que haya una caja habilitada")
+			else
+				this.llamarCliente(cajaElegida)
+		}
 	},
 
 	salirFila: function(idCliente){
