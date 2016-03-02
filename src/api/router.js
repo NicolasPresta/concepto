@@ -1,6 +1,6 @@
 import express from 'express'
-import log from 'src/lib/log'
-import secureManager from 'src/lib/secure'
+import log from '../lib/log'
+import secureManager from '../lib/secure'
 
 const router = express.Router();
 

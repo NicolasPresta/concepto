@@ -7,10 +7,11 @@ import socketio from 'socket.io'
 //import jwt from "jsonwebtoken"
 import socketJWT from "socketio-jwt"
 
-import colaManager from 'src/lib/cola'
-import log from 'src/lib/log'
-import appConfig from 'src/config/config'
-import router from 'src/api/router'
+
+import colaManager from './lib/cola'
+import log from './lib/log'
+import appConfig from './config/config'
+import router from './api/router'
 
 // Definicion de constantes
 const app = express();
@@ -18,7 +19,6 @@ const server = http.createServer(app);
 //const port = process.env.PORT || 3000
 const port = process.argv[2] || 3001;
 const io = socketio(server);
-
 
 // Middlewares
 //app.use(bodyParser.urlencoded({ extended: false })); // Analisar si se usa o si se puede sacar
