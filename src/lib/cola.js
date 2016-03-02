@@ -1,10 +1,10 @@
 // TODO: retrasarme, calcular tiempos de espera, etc
 
-import log from './console-log.js'
-import appConfig from './config';
+import log from 'src/lib/log'
+import appConfig from 'src/config/config';
 
-const MAXIMO_POR_CAJA = 2;
-const RETRASO_MINIMO = 2;
+const MAXIMO_POR_CAJA = 2; // La cantidad de gente al mismo tiempo que llaman las cajas.
+const RETRASO_MINIMO = 2; // La cantidad de personas que se dejan pasar en la fila cuando alguien se retrasa
 
 // Clase CAJA
 function Caja(nro){

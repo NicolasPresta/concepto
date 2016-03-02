@@ -3,7 +3,7 @@
  */
 import jwt from "jsonwebtoken"
 import device from 'device'
-import appConfig from './config'
+import appConfig from 'src/config/config'
 
 var secureManager = {
 

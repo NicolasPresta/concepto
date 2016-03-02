@@ -5,7 +5,7 @@
 
 import Log from 'log'
 import colors from 'colors'
-import appConfig from './config'
+import appConfig from 'src/config/config'
 
 const log = new Log(appConfig.LogLevel);
 

@@ -2,62 +2,31 @@
 import http from 'http'
 import express from 'express'
 import bodyParser from "body-parser"
-import methodOverride from "method-override"
+//import methodOverride from "method-override"
 import socketio from 'socket.io'
-import jwt from "jsonwebtoken"
+//import jwt from "jsonwebtoken"
 import socketJWT from "socketio-jwt"
 
-import colaManager from './lib/cola.js'
-import secureManager from './lib/secure'
-import log from './lib/console-log.js'
-import appConfig from './lib/config'
-
+import colaManager from 'src/lib/cola'
+import log from 'src/lib/log'
+import appConfig from 'src/config/config'
+import router from 'src/api/router'
 
 // Definicion de constantes
 const app = express();
 const server = http.createServer(app);
 //const port = process.env.PORT || 3000
 const port = process.argv[2] || 3001;
-const router = express.Router();
 const io = socketio(server);
 
-
-// Puntos de entrada REST
-//Handshake para dispositivos
-router.post('/handshake', (req, res) => {
-	log.debug(req.body);
-
-	//TODO: verificar de algún modo la autenticidad del uuid
-	let userAgent = req.headers['user-agent'];
-	let uuid = req.body.uuid;
-
-	let response = secureManager.handShake(userAgent, uuid);
-	res.status(response.code).json(response);
-});
-
-router.post('/authCashbox', (req, res) => {
-	log.debug(req.body);
-
-	let idCaja = req.body.idCaja;
-	let pass = req.body.password;
-
-	let response = secureManager.authCashbox(idCaja, pass);
-	res.status(response.code).json(response);
-});
-
-router.post('/testHandshake', (req, res) => {
-	log.debug(req.body);
-
-	let uuid = req.body.uuid;
-	let response = secureManager.testHandshake(uuid);
-	res.status(response.code).json(response);
-});
 
 // Middlewares
 //app.use(bodyParser.urlencoded({ extended: false })); // Analisar si se usa o si se puede sacar
 app.use(bodyParser.json());
 //app.use(methodOverride()); // Analisar si se usa o si se puede sacar
 app.use(router);
+// Permite servir los archivos estaticos de la carpeta /Cliente (necesario para levantar los clientes y cajas dummys)
+app.use(express.static('Cliente'))
 
 
 // Conexiones por socket
@@ -69,11 +38,6 @@ io.use(socketJWT.authorize({
 	secret: appConfig.app_secret,
 	handshake: true
 }));
-
-
-// Permite servir los archivos estaticos de la carpeta /Cliente (necesario para levantar los clientes y cajas dummys)
-app.use(express.static('Cliente'))
-
 
 io.sockets.on('connect', (socket) => {
 
@@ -101,7 +65,6 @@ io.sockets.on('connect', (socket) => {
 			colaManager.cerrarCaja(socket.decoded_token.uuid)
 			io.emit('actualizarFila', colaManager)
 		}
-
 	});
 
 
@@ -154,7 +117,6 @@ io.sockets.on('connect', (socket) => {
 		// grabar en base de datos el evento
 
 		// Grabar en REDIS la nueva cola
-
 	});
 
 
@@ -220,7 +182,6 @@ io.sockets.on('connect', (socket) => {
 
 		// Grabar en REDIS la nueva cola
 	});
-
 });
 
 //Dado un uuid retorna el socket

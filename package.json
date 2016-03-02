@@ -27,7 +27,7 @@
   "scripts": {
     "client": "grunt",
     "dist": "babel src/*.js src/**/*.js --out-dir dist --presets es2015",
-    "serve": "node dist/src",
+    "serve": "NODE_PATH=./dist node dist/src",
     "start": "npm run dist && npm run serve"
   },
   "repository": {
