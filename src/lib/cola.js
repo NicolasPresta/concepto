@@ -247,8 +247,6 @@ var colaManager = {
 					caja.sacarCliente(cliente);
 					if(caja.puedeAtenderNuevoCliente())
 						this.llamarCliente(caja);
-
-					return // TODO: Este return corta el forEach? (debería)
 				}
 			})
 		}
