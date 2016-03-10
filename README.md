@@ -1,6 +1,6 @@
-# concepto
+# filaServer
 
-Para pruebas de concepto varias... 
+Servidor NodeJs encargado de administrar las filas
 
 ### [TODO LIST: acá!](TODO.md)
 
@@ -18,7 +18,6 @@ npm install
 3° - Abrir CAJAS: desde el explorador http://localhost:3001/#/caja
 4° - Abrir CLIENTES: desde el explorador http://localhost:3001/#/cliente
 
-NOTA: para que funcione tuve que comentar todo lo relacionado a la seguridad, de otra forma los clientes no se conectaban al socket...
 ```
 
 ### Levantar cliente con grunt
