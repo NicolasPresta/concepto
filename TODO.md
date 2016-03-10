@@ -1,7 +1,7 @@
 # To Do Servidor
 
 - [x] Armar un TODO list.
-- [ ] Handshake: darle a cada cliente un ID único. 
+- [x] Handshake: darle a cada cliente un ID único. 
 - [ ] Validar conexión con los clientes (Seguridad)
 - [ ] Si un cliente se conecta y luego se desconecta debería poder segir operando como si nada (aunque cambie su socket, no cambia su ID) 
 - [ ] Grabar en Redis la última cola
